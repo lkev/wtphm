@@ -17,6 +17,6 @@ the get_batch_features function in batch_clustering.py can be accessed through b
 
 The sil_1_cluster and sil_n_clusters must be accessed through batch_clustering.py
 
-scada_laeblling.py is what is used to label the batches.
+scada_labelling.py is what is used to label the batches.
 
 event_probs.py is used to calculate probabilities that certain events will trigger each other

@@ -60,10 +60,12 @@ class Batches:
             self._get_grouped_event_data()
 
     def _get_grouped_event_data(self):
-        '''Returns the events dataframe but with some fault events which have
+        """Groups together similar event codes as the same code.
+
+        This returns the events dataframe but with some fault events which have
         different but similar codes and descriptions grouped together and
         relabelled to have the same code and description.
-        
+
         Example:
         The "grouping" gives the events "pitch thyristor 1 fault" with code 101,
         "pitch thyristor 2 fault" with code 102 and "pitch thyristor 3 fault"
@@ -79,7 +81,7 @@ class Batches:
             A subset of event_data, including only the codes in
             code_groups and codes, with the codes in code_groups all grouped
             together as one.
-        '''
+        """
 
         # if code_groups is just one list, i.e. [10, 11, 12], then change it to
         # [[10, 11, 12]]
@@ -192,7 +194,6 @@ class Batches:
             fault_event_ids: indices in the events data of faults that occurred
             all_event_ids: indices in the events data of all events (fault or
                 otherwise) that occurred during the batch
-
         """
 
         # if groups=False, then the only thing this means is that the
@@ -223,7 +224,8 @@ class Batches:
                     prev_end_time = end_time
 
                     end_time, all_events, fault_events, prev_hr = \
-                        self._get_batch_info(f, event_data, fd_t, t)
+                        self._get_batch_info(
+                            f, event_data, fd_t, t, self.ok_code)
 
                     if f.time_on > prev_end_time + pd.Timedelta(t_sep_lim):
                         # if it's a certain amount of time more since the last
@@ -246,7 +248,7 @@ class Batches:
         return self.batch_data
 
     @staticmethod
-    def _get_batch_info(f, event_data, fd_t, t):
+    def _get_batch_info(f, event_data, fd_t, t, ok_code):
         """get the end time and event ids in each batch"""
         # the new end_time is the next earliest ok_code event
         end_time = event_data[(event_data.time_on >= f.time_on) &

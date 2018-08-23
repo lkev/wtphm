@@ -17,7 +17,7 @@ wtphm.batch\_clustering module
 
 .. automodule:: wtphm.batch_clustering
     :members:
-    :undoc-members:
+..    :undoc-members:
     :show-inheritance:
 
 wtphm.event\_prediction module
@@ -25,7 +25,7 @@ wtphm.event\_prediction module
 
 .. automodule:: wtphm.event_prediction
     :members:
-    :undoc-members:
+..    :undoc-members:
     :show-inheritance:
 
 wtphm.event\_probs module
@@ -33,7 +33,7 @@ wtphm.event\_probs module
 
 .. automodule:: wtphm.event_probs
     :members:
-    :undoc-members:
+..    :undoc-members:
     :show-inheritance:
 
 wtphm.scada\_labelling module
@@ -41,7 +41,7 @@ wtphm.scada\_labelling module
 
 .. automodule:: wtphm.scada_labelling
     :members:
-    :undoc-members:
+..    :undoc-members:
     :show-inheritance:
 
 

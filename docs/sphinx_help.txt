@@ -1,9 +1,11 @@
 Workflow:
 
-* run sphinx-quickstart, include autodoc
+* run sphinx-quickstart from /docs, include autodoc
 * change the conf.py path to sys.path.insert(0, os.path.abspath('../'))
 * change the html_theme to 'sphinx_rtd_theme'
 * add 'sphinx.ext.napoleon'
-* run sphinx-apidoc
+* run sphinx-apidoc, with the sourcedir being ../wtphm
+* delete the "modules.rst" output from apidoc
+* copy and paste relevant parts of "wtphm.rst" into "index.rst" and then delete "wtphm.rst"
 
 Should then build!

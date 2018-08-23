@@ -1,0 +1,9 @@
+Workflow:
+
+* run sphinx-quickstart, include autodoc
+* change the conf.py path to sys.path.insert(0, os.path.abspath('../'))
+* change the html_theme to 'sphinx_rtd_theme'
+* add 'sphinx.ext.napoleon'
+* run sphinx-apidoc
+
+Should then build!

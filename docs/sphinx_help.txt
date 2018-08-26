@@ -7,5 +7,7 @@ Workflow:
 * run sphinx-apidoc, with the sourcedir being ../wtphm
 * delete the "modules.rst" output from apidoc
 * copy and paste relevant parts of "wtphm.rst" into "index.rst" and then delete "wtphm.rst"
+	- edited wtphm by removing :show-inheritance:. This stops the class inheritance from being listed in the docs, which isn't really too relevant anyway
+	- edited wtphm to remove "submodules" heading, as it seemed to be redundant given that all headings below it are at the same level
 
 Should then build!

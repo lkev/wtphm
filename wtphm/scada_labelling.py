@@ -397,69 +397,69 @@ def get_lagged_features(X, y, features_to_lag_inds, steps):
 #     return scada_data
 
 
-def balanced_subsample(x, y, maj_class=0, multiple=1):
-    """Creates a balanced training set by randomly undersampling the majority
-    class
+# def balanced_subsample(x, y, maj_class=0, multiple=1):
+#     """Creates a balanced training set by randomly undersampling the majority
+#     class
 
-    Args
-    ----
-    x: np.ndarray or pd.DataFrame
-        The training data (features)
-    y: np.ndarray or pd.DataFrame
-        The target values
-    maj_class: int
-        The y-value of the majority class
-    multiple: int
-        Multiple of undersampled majority class values to select. E.g. if set to
-        2, then no. of samples will be 2*number of next largest class
-    """
-    if isinstance(x, pd.DataFrame):
-        x = np.array(x)
+#     Args
+#     ----
+#     x: np.ndarray or pd.DataFrame
+#         The training data (features)
+#     y: np.ndarray or pd.DataFrame
+#         The target values
+#     maj_class: int
+#         The y-value of the majority class
+#     multiple: int
+#         Multiple of undersampled majority class values to select. E.g. if set to
+#         2, then no. of samples will be 2*number of next largest class
+#     """
+#     if isinstance(x, pd.DataFrame):
+#         x = np.array(x)
 
-    if isinstance(y, pd.DataFrame):
-        y = np.array(y)
+#     if isinstance(y, pd.DataFrame):
+#         y = np.array(y)
 
-    class_xs = []
+#     class_xs = []
 
-    # the number of elements in the biggest minority class
-    max_elems = None
+#     # the number of elements in the biggest minority class
+#     max_elems = None
 
-    for yi in np.unique(y):
-        elems = x[y == yi]
-        class_xs.append((yi, elems))
-        if (yi != maj_class) and (max_elems is None or
-                                  elems.shape[0] > max_elems):
-            max_elems = elems.shape[0]
-    xs = []
-    ys = []
+#     for yi in np.unique(y):
+#         elems = x[y == yi]
+#         class_xs.append((yi, elems))
+#         if (yi != maj_class) and (max_elems is None or
+#                                   elems.shape[0] > max_elems):
+#             max_elems = elems.shape[0]
+#     xs = []
+#     ys = []
 
-    for ci, this_xs in class_xs:
+#     for ci, this_xs in class_xs:
 
-        if ci == maj_class:
-            np.random.shuffle(this_xs)
+#         if ci == maj_class:
+#             np.random.shuffle(this_xs)
 
-        x_ = this_xs[:max_elems * multiple]
-        y_ = np.empty(len(x_))
-        y_.fill(ci)
+#         x_ = this_xs[:max_elems * multiple]
+#         y_ = np.empty(len(x_))
+#         y_.fill(ci)
 
-        xs.append(x_)
-        ys.append(y_)
+#         xs.append(x_)
+#         ys.append(y_)
 
-    xs = np.concatenate(xs)
-    ys = np.concatenate(ys)
+#     xs = np.concatenate(xs)
+#     ys = np.concatenate(ys)
 
-    return xs, ys
+#     return xs, ys
 
 
-class BasicFeature(TransformerMixin):
+# class BasicFeature(TransformerMixin):
 
-    def __init__(self, feature_list):
-        self.feature_list = feature_list
+#     def __init__(self, feature_list):
+#         self.feature_list = feature_list
 
-    def fit(self, X, y):
-        return self
+#     def fit(self, X, y):
+#         return self
 
-    def transform(self, X):
-        if type(X) is pd.DataFrame:
-            return X[self.feature_list]
+#     def transform(self, X):
+#         if type(X) is pd.DataFrame:
+#             return X[self.feature_list]
 

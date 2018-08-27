@@ -11,11 +11,11 @@ def label_stoppages(
     """Label times in the scada data which occurred during a stoppage and
     leading up to a stoppage as such.
 
-    This adds a column to the passed `scada_data`, "stoppage", and an optional
-    column "pre_stop". "stoppage" is given a 1 if the scada point in question
-    occurs during a stoppage, and "pre_stop" is given a 1 in the samples leading
-    up to the stoppage. Both are 0 otherwise. These vary under different
-    circumstances (see below).
+    This adds a column to the passed ``scada_data``, ``stoppage``, and an
+    optional column ``pre_stop``. ``stoppage`` is given a 1 if the scada point
+    in question occurs during a stoppage, and ``pre_stop`` is given a 1 in the
+    samples leading up to the stoppage. Both are 0 otherwise. These vary under
+    different circumstances (see below).
 
     Args
     ----
@@ -24,36 +24,38 @@ def label_stoppages(
     fault_batches: pandas.DataFrame
         The dataframe holding the indices in event_data and start and end times
         for each batch (each batch related to a stoppage).
-    drop_fault_batches: bool; default=True
+    drop_fault_batches: bool, default=True
         Whether to drop the actual entries which correspond to the batches, i.e.
         not the pre-fault data, but the fault data itself. This is highly
         recommended, as otherwise the stoppages themselves will be kept in the
-        returned data, though the "stoppage" label for these entries will be
+        returned data, though the ``stoppage`` label for these entries will be
         labelled as "1", while the fault-free data will be labelled "0".
     label_pre_stop: bool; default=True
-        If True, add a column to the returned scada_data_l for pre_stop. Samples
-        in the time leading up to a stoppage are given label 1, and 0 otherwise.
-    pre_stop_lims: 2*1 list of pd.Timedelta strs; default=['90 mins', 0]
-        The amount of time before a stoppage to label scada as pre_stop. E.g.,
-        `pre_stop` is labelled as 1 in the time between 90 mins and 0 mins
-        before the stoppage occurs. ['120 mins', '20 mins'] would give scada
-        samples from 120 minutes before until 20 minutes before the stoppage the
-        pre_stop label 1.
+        If True, add a column to the returned ``scada_data_l`` for ``pre_stop``.
+        Samples in the time leading up to a stoppage are given label 1, and 0
+        otherwise.
+    pre_stop_lims: 2*1 list of pd.Timedelta strs, default=['90 mins', 0]
+        The amount of time before a stoppage to label scada as ``pre_stop``.
+        E.g., by default, ``pre_stop`` is labelled as 1 in the time between 90
+        mins and 0 mins before the stoppage occurs. If ['120 mins', '20 mins']
+        is passed, scada samples from 120 minutes before until 20 minutes before
+        the stoppage are given the ``pre_stop`` label 1.
     batches_to_drop: pd.DataFrame, optional; default=None
         Additional batches which should be dropped from the scada data. If this
-        is passed, drop_type must be given a string as well.
+        is passed, ``drop_type`` must be given a string as well.
     drop_type: str, optional; default=None
-        Only used when batches_to_drop has been passed.
+        Only used when ``batches_to_drop`` has been passed.
         If 'both', the stoppage and pre-stop entries (according to
-        pre_stop_lims) corresponding to batches in batches_to_drop are dropped
-        from the scada data.
+        pre_stop_lims) corresponding to batches in ``batches_to_drop`` are
+        dropped from the scada data.
         If 'stop', only the stoppage entries are dropped
         If 'pre', opnly the pre-stop entries are dropped
+
     Returns
     -------
     scada_data_l: pd.DataFrame
-        The original scada_data dataframe with the `pre_stop`, `stoppage` and
-        `batch_id` columns added
+        The original scada_data dataframe with the ``pre_stop``, ``stoppage``
+        and ``batch_id`` columns added
     """
 
     if (batches_to_drop is not None) and (drop_type is None):
@@ -178,11 +180,16 @@ def get_lagged_features(X, y, features_to_lag_inds, steps):
     steps: int
         The number of lagging steps. This means for feature 'B' at time T,
         features will be added to X at T for B@(T-1), B@(T-2)...B@(T-steps).
+
     Returns
     -------
     X_lagged: np.ndarray
-        An array with the original features and lagged features appended
-    y_lagged
+        An array with the original features and lagged features appended. The
+        number of samples will necessarily be decreased because there will be
+        some samples at the start with NA values for features.
+    y_lagged: np.ndarray
+        An updated array of target vaues corresponding to the new number of
+        samples in ``X_lagged``
 
     """
     # get a slice with columns of features to be lagged
@@ -390,69 +397,69 @@ def get_lagged_features(X, y, features_to_lag_inds, steps):
 #     return scada_data
 
 
-def balanced_subsample(x, y, maj_class=0, multiple=1):
-    """Creates a balanced training set by randomly undersampling the majority
-    class
+# def balanced_subsample(x, y, maj_class=0, multiple=1):
+#     """Creates a balanced training set by randomly undersampling the majority
+#     class
 
-    Args
-    ----
-    x: np.ndarray or pd.DataFrame
-        The training data (features)
-    y: np.ndarray or pd.DataFrame
-        The target values
-    maj_class: int
-        The y-value of the majority class
-    multiple: int
-        Multiple of undersampled majority class values to select. E.g. if set to
-        2, then no. of samples will be 2*number of next largest class
-    """
-    if isinstance(x, pd.DataFrame):
-        x = np.array(x)
+#     Args
+#     ----
+#     x: np.ndarray or pd.DataFrame
+#         The training data (features)
+#     y: np.ndarray or pd.DataFrame
+#         The target values
+#     maj_class: int
+#         The y-value of the majority class
+#     multiple: int
+#         Multiple of undersampled majority class values to select. E.g. if set to
+#         2, then no. of samples will be 2*number of next largest class
+#     """
+#     if isinstance(x, pd.DataFrame):
+#         x = np.array(x)
 
-    if isinstance(y, pd.DataFrame):
-        y = np.array(y)
+#     if isinstance(y, pd.DataFrame):
+#         y = np.array(y)
 
-    class_xs = []
+#     class_xs = []
 
-    # the number of elements in the biggest minority class
-    max_elems = None
+#     # the number of elements in the biggest minority class
+#     max_elems = None
 
-    for yi in np.unique(y):
-        elems = x[y == yi]
-        class_xs.append((yi, elems))
-        if (yi != maj_class) and (max_elems is None or
-                                  elems.shape[0] > max_elems):
-            max_elems = elems.shape[0]
-    xs = []
-    ys = []
+#     for yi in np.unique(y):
+#         elems = x[y == yi]
+#         class_xs.append((yi, elems))
+#         if (yi != maj_class) and (max_elems is None or
+#                                   elems.shape[0] > max_elems):
+#             max_elems = elems.shape[0]
+#     xs = []
+#     ys = []
 
-    for ci, this_xs in class_xs:
+#     for ci, this_xs in class_xs:
 
-        if ci == maj_class:
-            np.random.shuffle(this_xs)
+#         if ci == maj_class:
+#             np.random.shuffle(this_xs)
 
-        x_ = this_xs[:max_elems * multiple]
-        y_ = np.empty(len(x_))
-        y_.fill(ci)
+#         x_ = this_xs[:max_elems * multiple]
+#         y_ = np.empty(len(x_))
+#         y_.fill(ci)
 
-        xs.append(x_)
-        ys.append(y_)
+#         xs.append(x_)
+#         ys.append(y_)
 
-    xs = np.concatenate(xs)
-    ys = np.concatenate(ys)
+#     xs = np.concatenate(xs)
+#     ys = np.concatenate(ys)
 
-    return xs, ys
+#     return xs, ys
 
 
-class BasicFeature(TransformerMixin):
+# class BasicFeature(TransformerMixin):
 
-    def __init__(self, feature_list):
-        self.feature_list = feature_list
+#     def __init__(self, feature_list):
+#         self.feature_list = feature_list
 
-    def fit(self, X, y):
-        return self
+#     def fit(self, X, y):
+#         return self
 
-    def transform(self, X):
-        if type(X) is pd.DataFrame:
-            return X[self.feature_list]
+#     def transform(self, X):
+#         if type(X) is pd.DataFrame:
+#             return X[self.feature_list]
 

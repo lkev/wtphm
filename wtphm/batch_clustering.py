@@ -21,8 +21,8 @@ def get_batch_features(event_data, fault_codes, batch_data, method, lo=1,
     extraction method is used. Details of the feature extraction methods can
     be found in [1].
 
-    **Note:** For each "batch" of alarms, there are up to `num_codes` unique
-    alarm codes. Each alarm has an associated start time, `time_on`.
+    **Note:** For each "batch" of alarms, there are up to ``num_codes`` unique
+    alarm codes. Each alarm has an associated start time, ``time_on``.
 
     Args
     ----
@@ -31,38 +31,40 @@ def get_batch_features(event_data, fault_codes, batch_data, method, lo=1,
     fault_codes: numpy.ndarray
         All event codes that will be treated as fault events for the batches
     batch_data: pandas.DataFrame
-        The dataframe holding the indices in event_data and start and end times
-        for each batch
+        The dataframe holding the indices in ``event_data`` and start and end
+        times for each batch
     method: string
         One of 'basic', 't_on', 'time'.
         basic:
-            * Only considers batches with between `lo` and `hi` individual
+            * Only considers batches with between ``lo`` and ``hi`` individual
               alarms.
-            * Array of zeros is filled with 'num' corresponding to order of
+            * Array of zeros is filled with ``num`` corresponding to order of
               alarms' appearance.
             * Does not take into account whether alarms occurred
               simultaneously.
-            * Resultant vector of length 'num_codes' * 'hi'
+            * Resultant vector of length ``num_codes * hi``
         t_on:
-            * Only consider batches with between 'lo' and 'hi' individual
-              'time_on's.
-            * For each `time_on` in each batch, an array of zeros is filled
+            * Only consider batches with between ``lo`` and ``hi`` individual
+              ``time_on``\s.
+            * For each ``time_on`` in each batch, an array of zeros is filled
               with ones in places corresponding to an alarm that has fired
               at that time.
-            * Results in a pattern array of length (`num_codes` * `hi`)
+            * Results in a pattern array of length ``num_codes * hi``
               which shows the sequential order of the alarms which have been
               fired.
         time:
             * Same as above, but extra features are added showing the amount
-              of time between each "time_on"
+              of time between each ``time_on``
     lo: integer, default=1
-        For method='basic', only batches with a minimum of 'lo' alarms will
-        be included in the returned feature set.
-        for method='t_on' or 'time', it's the minimum number of 'time_on's.
+        For ``method='basic'``, only batches with a minimum of ``lo`` alarms
+        will be included in the returned feature set.
+        for ``method='t_on'`` or ``method='time'``, it's the minimum number of
+        ``time_on``\s.
     hi: integer, default=10
-        For method='basic', only batches with a maximum of 'hi' alarms will
-        be included in the returned feature set.
-        for method='t_on' or 'time', it's the maximum number of 'time_on's.
+        For ``method='basic'``, only batches with a maximum of ``hi`` alarms
+        will be included in the returned feature set.
+        for ``method='t_on'`` or ``method='time'``, it's the maximum number of
+        ``time_on``\s.
     num: integer, float, default=1
         The number to be placed in the feature vector to indicate the
         presence of a particular alarm
@@ -74,13 +76,13 @@ def get_batch_features(event_data, fault_codes, batch_data, method, lo=1,
     -------
     feature_array: numpy.ndarray
         An array of feature arrays corresponding to each batch that has has
-        met the 'hi' and 'lo' criteria
+        met the ``hi`` and ``lo`` criteria
     assoc_batch: unmpy.ndarray
         An array of 2-length index arrays. It is the same length as
-        feature_array, and each entry points to the corresponding
-        feature_array's index in batch_data, which in turn contains the index
-        of the feature_arrays associated events in the original events_data
-        or fault_data.
+        ``feature_array``, and each entry points to the corresponding
+        ``feature_array``'s index in ``batch_data``, which in turn contains the
+        index of the ``feature_array``'s associated events in the original
+        ``events_data`` or ``fault_data``.
     """
 
     if event_type == 'fault_events':
@@ -115,7 +117,7 @@ def get_batch_features(event_data, fault_codes, batch_data, method, lo=1,
 
 def _batch_features_basic(batch_data, event_type, event_data, num_codes,
                           code_idx, lo, hi, num):
-    '''Called when method='basic' for extract_batch_features()'''
+    '''Called when method='basic' for get_batch_features()'''
 
     feature_array = []
     assoc_batch = []
@@ -149,7 +151,7 @@ def _batch_features_basic(batch_data, event_type, event_data, num_codes,
 
 def _batch_features_t_on(batch_data, event_type, event_data, num_codes,
                          code_idx, lo, hi, num):
-    '''Called when method='t_on' for extract_batch_features()'''
+    '''Called when method='t_on' for get_batch_features()'''
     feature_array = []
     assoc_batch = []
 
@@ -185,7 +187,7 @@ def _batch_features_t_on(batch_data, event_type, event_data, num_codes,
 
 def _batch_features_t_on_time(batch_data, event_type, event_data, num_codes,
                               code_idx, lo, hi, num):
-    '''Called when method='time' for extract_batch_features()'''
+    '''Called when method='time' for get_batch_features()'''
 
     feature_array = []
     assoc_batch = []
@@ -243,17 +245,26 @@ def sil_1_cluster(
 
     Args
     ----
-    X: features
-    cluster_labels: the labels of each cluster
-    axis_label: whether or not to label the cluster plot with each cluster's
+    X : np.array or list-like
+        Features (possibly ``feature_array`` - need to check!)
+    cluster_labels : list of strings
+        the labels of each cluster
+    axis_label : Boolean, default=True
+        Whether or not to label the cluster plot with each cluster's
         number
-    save: whether or not to save the resulting silhouette plot
-    save_name: the saved filename
-    x_label: the x axis label for the plot
-    avg_pos: where to position the text for the average silghouette score
+    save : Boolean, default=False
+        Whether or not to save the resulting silhouette plot
+    save_name : String
+        The saved filename
+    x_label : String
+        The x axis label for the plot
+    avg_pos : float
+        Where to position the text for the average silghouette score
         relative to the position of the "average" line
-    w: width of plot
-    h: height of plot
+    w : float or int
+        width of plot
+    h : float or int
+        height of plot
 
 
     Returns
@@ -331,16 +342,19 @@ def sil_n_clusters(X, range_n_clusters, clust):
 
     Args
     ----
-    X: features
-    range_n_clusters: the range of clusters you want, e.g. [2,3,4,5,10,20]
-    clust: the sklearn clusterer to use, e.g. KMeans
+    X : np.array or list-like
+        Features (possibly ``feature_array`` - need to check!)
+    range_n_clusters : list-like
+        The range of clusters you want, e.g. [2,3,4,5,10,20]
+    clust : sklearn clusterer
+        the sklearn clusterer to use, e.g. KMeans
 
     Returns
     -------
     cluster_labels: numpy.ndarray
         The labels for the clusters, with each one corresponding to a feature
-        vector in X
-    also prints the silhouette analysis
+        vector in ``X``.
+    Also prints the silhouette analysis
 
     """
     warnings.warn(
@@ -427,20 +441,19 @@ def cluster_times(batch_data, cluster_labels, assoc_batch,
     Args
     ----
     batch_data: pandas.DataFrame
-        The dataframe holding the indices in event_data and start and end times
-        for each batch
+        The dataframe holding the indices in ``event_data`` and start and end
+        times for each batch
     cluster_labels:  numpy.ndarray
         The labels for the clusters, with each one corresponding to a feature
-        vector in assoc_batch
+        vector in ``assoc_batch``
     assoc_batch: nunmpy.ndarray
-        Indices of batch_inds associated with each feature_array. Obtained
-        from the extract_batch_features() function in this module (see for
-        details).
+        Indices of batches associated with each ``feature_array``. Obtained
+        from :func:`.get_batch_features`
     event_dur_type: string
         The event group duration in batch_data to return, i.e. either
         'fault_dur' or 'down_dur'. 'down_dur' means the entire time the turbine
         was offline, 'fault_dur' just means while the turbine was faulting. See
-        Batches.get_batches() in batch.py for details
+        :func:`wtphm.batch.Batches.get_batch_data` for details
 
     Returns
     -------

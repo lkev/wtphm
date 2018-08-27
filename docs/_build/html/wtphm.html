@@ -85,9 +85,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-wtphm.batch_clustering">wtphm.batch_clustering module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-wtphm.event_probs">wtphm.event_probs module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-wtphm.scada_labelling">wtphm.scada_labelling module</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-wtphm.scada_labelling">wtphm.scada_labelling module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-wtphm">Module contents</a></li>
 </ul>
 </li>
@@ -187,7 +185,8 @@ turbine. Each one of these has an event code.</li>
 that happen along different turbine axes, may be given the same code and
 description so they are treated as the same event code during analysis.
 Must be in the form: ‘[[10, 11, 12], [24, 25], [56, 57, 58]]’ or
-‘[10, 11, 12]’</li>
+‘[10, 11, 12]’. If this is passed, then the attributes
+<code class="docutils literal notranslate"><span class="pre">grouped_fault_codes</span></code> and <code class="docutils literal notranslate"><span class="pre">grouped_event_data</span></code> become available.</li>
 <li><strong>ok_code</strong> (<em>int</em><em>, </em><em>default=6</em>) – A code which signifies the turbine returning to normal operation after
 being shut down or curtailed due to a fault or otherwise</li>
 </ul>
@@ -204,7 +203,14 @@ being shut down or curtailed due to a fault or otherwise</li>
 <dl class="attribute">
 <dt id="wtphm.batch.Batches.grouped_event_data">
 <code class="descname">grouped_event_data</code><a class="headerlink" href="#wtphm.batch.Batches.grouped_event_data" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>pandas.DataFrame</em> – The <cite>event_data</cite>, but with codes and descriptions from <code class="docutils literal notranslate"><span class="pre">code_groups</span></code>
+<dd><p><em>pandas.DataFrame</em> – The <code class="docutils literal notranslate"><span class="pre">event_data</span></code>, but with codes and descriptions from <code class="docutils literal notranslate"><span class="pre">code_groups</span></code>
+changed so that similar ones are identical</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="wtphm.batch.Batches.grouped_fault_data">
+<code class="descname">grouped_fault_data</code><a class="headerlink" href="#wtphm.batch.Batches.grouped_fault_data" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>pandas.DataFrame</em> – The <code class="docutils literal notranslate"><span class="pre">fault_data</span></code>, but with codes and descriptions from <code class="docutils literal notranslate"><span class="pre">code_groups</span></code>
 changed so that similar ones are identical</p>
 </dd></dl>
 
@@ -223,7 +229,7 @@ identical</p>
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td><a class="reference internal" href="#wtphm.batch.Batches.get_batch_data" title="wtphm.batch.Batches.get_batch_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_batch_data</span></code></a>([t_sep_lim,&nbsp;groups])</td>
-<td>Get the distinct batches of events as they appear in the event_data.</td>
+<td>Get the distinct batches of events as they appear in the <code class="docutils literal notranslate"><span class="pre">event_data</span></code>.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#wtphm.batch.Batches.get_batch_features" title="wtphm.batch.Batches.get_batch_features"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_batch_features</span></code></a>(method[,&nbsp;batch_data,&nbsp;lo,&nbsp;…])</td>
 <td>Extract features from batches of events which appear during stoppages, to be used for clustering.</td>
@@ -233,22 +239,24 @@ identical</p>
 <dl class="method">
 <dt id="wtphm.batch.Batches.get_batch_data">
 <code class="descname">get_batch_data</code><span class="sig-paren">(</span><em>t_sep_lim='12 hour'</em>, <em>groups=True</em><span class="sig-paren">)</span><a class="headerlink" href="#wtphm.batch.Batches.get_batch_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the distinct batches of events as they appear in the event_data.</p>
+<dd><p>Get the distinct batches of events as they appear in the <code class="docutils literal notranslate"><span class="pre">event_data</span></code>.</p>
 <p>Each batch is a group of fault events. A batch always begins with a
-fault event from one of the codes in fault_data, and ends with the code
-ok_code, which signifies the turbine returning to normal operation.</p>
+fault event from one of the codes in <code class="docutils literal notranslate"><span class="pre">fault_codes</span></code>, and ends with the
+code <code class="docutils literal notranslate"><span class="pre">ok_code</span></code>, which signifies the turbine returning to normal
+operation.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>t_sep_lim</strong> (<em>str</em><em>, </em><em>default='1 hour'</em><em>, </em><em>must be compatible with pd.Timedelta</em>) – If a batch ends, and a second batch begins less than t_sep_lim
-afterwards, then the two batches are treated as one, it treats the
+<li><strong>t_sep_lim</strong> (<em>str</em><em>, </em><em>default='1 hour'</em><em>, </em><em>must be compatible with pd.Timedelta</em>) – If a batch ends, and a second batch begins less than <code class="docutils literal notranslate"><span class="pre">t_sep_lim</span></code>
+afterwards, then the two batches are treated as one. It treats the
 the turbine coming back online and immediately faulting again as one
 continuous batch. This effect is stacked so that if a third fault
-event happens less than an hour after the second, all three are
-treated as the same continuous batch.</li>
-<li><strong>groups</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Whether or not the returned dataframe.</li>
+event happens less than <code class="docutils literal notranslate"><span class="pre">t_sep_lim</span></code> after the second, all three
+are treated as the same continuous batch.</li>
+<li><strong>groups</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Whether or not the returned dataframe will group together similar
+fault codes, as per <code class="docutils literal notranslate"><span class="pre">grouped_fault_codes</span></code>.</li>
 </ul>
 </td>
 </tr>
@@ -293,7 +301,7 @@ be found in [1].</p>
 unique alarm codes. Each alarm has an associated start time,
 <code class="docutils literal notranslate"><span class="pre">time_on</span></code>.</p>
 <p>This method is just a wrapper for
-<code class="docutils literal notranslate"><span class="pre">batch_clustering.get_batch_features()</span></code>.</p>
+<a class="reference internal" href="#wtphm.batch_clustering.get_batch_features" title="wtphm.batch_clustering.get_batch_features"><code class="xref py py-func docutils literal notranslate"><span class="pre">wtphm.batch_clustering.get_batch_features()</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -315,7 +323,7 @@ simultaneously.</li>
 <dt>t_on:</dt>
 <dd><ul class="first last">
 <li>Only consider batches with between <code class="docutils literal notranslate"><span class="pre">lo</span></code> and <code class="docutils literal notranslate"><span class="pre">hi</span></code>
-individual <a href="#id1"><span class="problematic" id="id2">``</span></a>time_on``s.</li>
+individual <code class="docutils literal notranslate"><span class="pre">time_on</span></code>s.</li>
 <li>For each <code class="docutils literal notranslate"><span class="pre">time_on</span></code> in each batch, an array of zeros is
 filled with ones in places corresponding to an alarm that has
 fired at that time.</li>
@@ -337,10 +345,10 @@ of time between each <code class="docutils literal notranslate"><span class="pre
 certain duration wish to be included</li>
 <li><strong>lo</strong> (<em>integer</em><em>, </em><em>default=1</em>) – For <code class="docutils literal notranslate"><span class="pre">method='basic'</span></code>, only batches with a minimum of <code class="docutils literal notranslate"><span class="pre">lo</span></code> alarms
 will be included in the returned feature set. For <code class="docutils literal notranslate"><span class="pre">method='t_on'</span></code>
-or <code class="docutils literal notranslate"><span class="pre">'time'</span></code>, it’s the minimum number of <a href="#id3"><span class="problematic" id="id4">``</span></a>time_on``s.</li>
+or <code class="docutils literal notranslate"><span class="pre">'time'</span></code>, it’s the minimum number of <code class="docutils literal notranslate"><span class="pre">time_on</span></code>s.</li>
 <li><strong>hi</strong> (<em>integer</em><em>, </em><em>default=10</em>) – For <code class="docutils literal notranslate"><span class="pre">method='basic'</span></code>, only batches with a maximum of <code class="docutils literal notranslate"><span class="pre">hi</span></code> alarms
 will be included in the returned feature set. For <code class="docutils literal notranslate"><span class="pre">method='t_on'</span></code>
-or <code class="docutils literal notranslate"><span class="pre">'time'</span></code>, it’s the maximum number of <a href="#id5"><span class="problematic" id="id6">``</span></a>time_on``s.</li>
+or <code class="docutils literal notranslate"><span class="pre">'time'</span></code>, it’s the maximum number of <code class="docutils literal notranslate"><span class="pre">time_on</span></code>s.</li>
 <li><strong>num</strong> (<em>integer</em><em>, </em><em>float</em><em>, </em><em>default=1</em>) – The number to be placed in the feature vector to indicate the
 presence of a particular alarm</li>
 <li><strong>event_type</strong> (<em>string</em><em>, </em><em>default='fault_events'</em>) – The members of batch_data to include for building the feature set.
@@ -350,13 +358,13 @@ Should normally be <code class="docutils literal notranslate"><span class="pre">
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
-<li><strong>feature_array</strong> (<em>numpy.ndarray</em>) – An array of feature arrays corresponding to each batch that has has
-met the ‘hi’ and ‘lo’ criteria</li>
+<li><strong>feature_array</strong> (<em>numpy.ndarray</em>) – An array of feature arrays corresponding to each batch that has met
+the <code class="docutils literal notranslate"><span class="pre">hi</span></code> and <code class="docutils literal notranslate"><span class="pre">lo</span></code> criteria</li>
 <li><strong>assoc_batch</strong> (<em>unmpy.ndarray</em>) – An array of 2-length index arrays. It is the same length as
-feature_array, and each entry points to the corresponding
-feature_array’s index in batch_data, which in turn contains the
-index of the feature_arrays associated events in the original
-events_data or fault_data.</li>
+<code class="docutils literal notranslate"><span class="pre">feature_array</span></code>, and each entry points to the corresponding
+<code class="docutils literal notranslate"><span class="pre">feature_array</span></code>’s index in <code class="docutils literal notranslate"><span class="pre">batch_data</span></code>, which in turn contains
+the index of the <code class="docutils literal notranslate"><span class="pre">feature_array</span></code>’s associated events in the
+original <code class="docutils literal notranslate"><span class="pre">events_data</span></code> or <code class="docutils literal notranslate"><span class="pre">fault_data</span></code>.</li>
 </ul>
 </p>
 </td>
@@ -371,38 +379,6 @@ events_data or fault_data.</li>
 <div class="section" id="module-wtphm.batch_clustering">
 <span id="wtphm-batch-clustering-module"></span><h2>wtphm.batch_clustering module<a class="headerlink" href="#module-wtphm.batch_clustering" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="wtphm.batch_clustering.cluster_times">
-<code class="descclassname">wtphm.batch_clustering.</code><code class="descname">cluster_times</code><span class="sig-paren">(</span><em>batch_data</em>, <em>cluster_labels</em>, <em>assoc_batch</em>, <em>event_dur_type='down_dur'</em><span class="sig-paren">)</span><a class="headerlink" href="#wtphm.batch_clustering.cluster_times" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a DataFrame with a summary of the size and durations of batch
-members</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>batch_data</strong> (<em>pandas.DataFrame</em>) – The dataframe holding the indices in event_data and start and end times
-for each batch</li>
-<li><strong>cluster_labels</strong> (<em>numpy.ndarray</em>) – The labels for the clusters, with each one corresponding to a feature
-vector in assoc_batch</li>
-<li><strong>assoc_batch</strong> (<em>nunmpy.ndarray</em>) – Indices of batch_inds associated with each feature_array. Obtained
-from the extract_batch_features() function in this module (see for
-details).</li>
-<li><strong>event_dur_type</strong> (<em>string</em>) – The event group duration in batch_data to return, i.e. either
-‘fault_dur’ or ‘down_dur’. ‘down_dur’ means the entire time the turbine
-was offline, ‘fault_dur’ just means while the turbine was faulting. See
-Batches.get_batches() in batch.py for details</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>summary</strong> (<em>Pandas.DataFrame</em>) – The DataFrame has the total duration, mean duration, standard deviation
-of the duration and number of stoppages in each cluster.</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
 <dt id="wtphm.batch_clustering.get_batch_features">
 <code class="descclassname">wtphm.batch_clustering.</code><code class="descname">get_batch_features</code><span class="sig-paren">(</span><em>event_data</em>, <em>fault_codes</em>, <em>batch_data</em>, <em>method</em>, <em>lo=1</em>, <em>hi=10</em>, <em>num=1</em>, <em>event_type='fault_events'</em><span class="sig-paren">)</span><a class="headerlink" href="#wtphm.batch_clustering.get_batch_features" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract features from batches of events which appear during
@@ -411,8 +387,8 @@ stoppages.</p>
 included. These constraints are chosen depending on which feature
 extraction method is used. Details of the feature extraction methods can
 be found in [1].</p>
-<p><strong>Note:</strong> For each “batch” of alarms, there are up to <cite>num_codes</cite> unique
-alarm codes. Each alarm has an associated start time, <cite>time_on</cite>.</p>
+<p><strong>Note:</strong> For each “batch” of alarms, there are up to <code class="docutils literal notranslate"><span class="pre">num_codes</span></code> unique
+alarm codes. Each alarm has an associated start time, <code class="docutils literal notranslate"><span class="pre">time_on</span></code>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -420,30 +396,30 @@ alarm codes. Each alarm has an associated start time, <cite>time_on</cite>.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>event_data</strong> (<em>pandas.DataFrame</em>) – The original events/fault data</li>
 <li><strong>fault_codes</strong> (<em>numpy.ndarray</em>) – All event codes that will be treated as fault events for the batches</li>
-<li><strong>batch_data</strong> (<em>pandas.DataFrame</em>) – The dataframe holding the indices in event_data and start and end times
-for each batch</li>
+<li><strong>batch_data</strong> (<em>pandas.DataFrame</em>) – The dataframe holding the indices in <code class="docutils literal notranslate"><span class="pre">event_data</span></code> and start and end
+times for each batch</li>
 <li><strong>method</strong> (<em>string</em>) – <p>One of ‘basic’, ‘t_on’, ‘time’.
 basic:</p>
 <blockquote>
 <div><ul>
-<li>Only considers batches with between <cite>lo</cite> and <cite>hi</cite> individual
+<li>Only considers batches with between <code class="docutils literal notranslate"><span class="pre">lo</span></code> and <code class="docutils literal notranslate"><span class="pre">hi</span></code> individual
 alarms.</li>
-<li>Array of zeros is filled with ‘num’ corresponding to order of
+<li>Array of zeros is filled with <code class="docutils literal notranslate"><span class="pre">num</span></code> corresponding to order of
 alarms’ appearance.</li>
 <li>Does not take into account whether alarms occurred
 simultaneously.</li>
-<li>Resultant vector of length ‘num_codes’ * ‘hi’</li>
+<li>Resultant vector of length <code class="docutils literal notranslate"><span class="pre">num_codes</span> <span class="pre">*</span> <span class="pre">hi</span></code></li>
 </ul>
 </div></blockquote>
 <dl class="docutils">
 <dt>t_on:</dt>
 <dd><ul class="first last">
-<li>Only consider batches with between ‘lo’ and ‘hi’ individual
-‘time_on’s.</li>
-<li>For each <cite>time_on</cite> in each batch, an array of zeros is filled
+<li>Only consider batches with between <code class="docutils literal notranslate"><span class="pre">lo</span></code> and <code class="docutils literal notranslate"><span class="pre">hi</span></code> individual
+<code class="docutils literal notranslate"><span class="pre">time_on</span></code>s.</li>
+<li>For each <code class="docutils literal notranslate"><span class="pre">time_on</span></code> in each batch, an array of zeros is filled
 with ones in places corresponding to an alarm that has fired
 at that time.</li>
-<li>Results in a pattern array of length (<cite>num_codes</cite> * <cite>hi</cite>)
+<li>Results in a pattern array of length <code class="docutils literal notranslate"><span class="pre">num_codes</span> <span class="pre">*</span> <span class="pre">hi</span></code>
 which shows the sequential order of the alarms which have been
 fired.</li>
 </ul>
@@ -451,17 +427,19 @@ fired.</li>
 <dt>time:</dt>
 <dd><ul class="first last">
 <li>Same as above, but extra features are added showing the amount
-of time between each “time_on”</li>
+of time between each <code class="docutils literal notranslate"><span class="pre">time_on</span></code></li>
 </ul>
 </dd>
 </dl>
 </li>
-<li><strong>lo</strong> (<em>integer</em><em>, </em><em>default=1</em>) – For method=’basic’, only batches with a minimum of ‘lo’ alarms will
-be included in the returned feature set.
-for method=’t_on’ or ‘time’, it’s the minimum number of ‘time_on’s.</li>
-<li><strong>hi</strong> (<em>integer</em><em>, </em><em>default=10</em>) – For method=’basic’, only batches with a maximum of ‘hi’ alarms will
-be included in the returned feature set.
-for method=’t_on’ or ‘time’, it’s the maximum number of ‘time_on’s.</li>
+<li><strong>lo</strong> (<em>integer</em><em>, </em><em>default=1</em>) – For <code class="docutils literal notranslate"><span class="pre">method='basic'</span></code>, only batches with a minimum of <code class="docutils literal notranslate"><span class="pre">lo</span></code> alarms
+will be included in the returned feature set.
+for <code class="docutils literal notranslate"><span class="pre">method='t_on'</span></code> or <code class="docutils literal notranslate"><span class="pre">method='time'</span></code>, it’s the minimum number of
+<code class="docutils literal notranslate"><span class="pre">time_on</span></code>s.</li>
+<li><strong>hi</strong> (<em>integer</em><em>, </em><em>default=10</em>) – For <code class="docutils literal notranslate"><span class="pre">method='basic'</span></code>, only batches with a maximum of <code class="docutils literal notranslate"><span class="pre">hi</span></code> alarms
+will be included in the returned feature set.
+for <code class="docutils literal notranslate"><span class="pre">method='t_on'</span></code> or <code class="docutils literal notranslate"><span class="pre">method='time'</span></code>, it’s the maximum number of
+<code class="docutils literal notranslate"><span class="pre">time_on</span></code>s.</li>
 <li><strong>num</strong> (<em>integer</em><em>, </em><em>float</em><em>, </em><em>default=1</em>) – The number to be placed in the feature vector to indicate the
 presence of a particular alarm</li>
 <li><strong>event_type</strong> (<em>string</em><em>, </em><em>default='fault_events'</em>) – The members of batch_data to include for building the feature set.
@@ -471,12 +449,12 @@ Should normally be ‘fault_events’ or ‘all_events’</li>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
 <li><strong>feature_array</strong> (<em>numpy.ndarray</em>) – An array of feature arrays corresponding to each batch that has has
-met the ‘hi’ and ‘lo’ criteria</li>
+met the <code class="docutils literal notranslate"><span class="pre">hi</span></code> and <code class="docutils literal notranslate"><span class="pre">lo</span></code> criteria</li>
 <li><strong>assoc_batch</strong> (<em>unmpy.ndarray</em>) – An array of 2-length index arrays. It is the same length as
-feature_array, and each entry points to the corresponding
-feature_array’s index in batch_data, which in turn contains the index
-of the feature_arrays associated events in the original events_data
-or fault_data.</li>
+<code class="docutils literal notranslate"><span class="pre">feature_array</span></code>, and each entry points to the corresponding
+<code class="docutils literal notranslate"><span class="pre">feature_array</span></code>’s index in <code class="docutils literal notranslate"><span class="pre">batch_data</span></code>, which in turn contains the
+index of the <code class="docutils literal notranslate"><span class="pre">feature_array</span></code>’s associated events in the original
+<code class="docutils literal notranslate"><span class="pre">events_data</span></code> or <code class="docutils literal notranslate"><span class="pre">fault_data</span></code>.</li>
 </ul>
 </p>
 </td>
@@ -495,15 +473,17 @@ optionally save it</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>X</strong> (<em>features</em>) – </li>
-<li><strong>cluster_labels</strong> (<em>the labels of each cluster</em>) – </li>
-<li><strong>axis_label</strong> (<em>whether</em><em> or </em><em>not to label the cluster plot with each cluster's</em>) – number</li>
-<li><strong>save</strong> (<em>whether</em><em> or </em><em>not to save the resulting silhouette plot</em>) – </li>
-<li><strong>save_name</strong> (<em>the saved filename</em>) – </li>
-<li><strong>x_label</strong> (<em>the x axis label for the plot</em>) – </li>
-<li><strong>avg_pos</strong> (<em>where to position the text for the average silghouette score</em>) – relative to the position of the “average” line</li>
-<li><strong>w</strong> (<em>width of plot</em>) – </li>
-<li><strong>h</strong> (<em>height of plot</em>) – </li>
+<li><strong>X</strong> (<em>np.array</em><em> or </em><em>list-like</em>) – Features (possibly <code class="docutils literal notranslate"><span class="pre">feature_array</span></code> - need to check!)</li>
+<li><strong>cluster_labels</strong> (<em>list of strings</em>) – the labels of each cluster</li>
+<li><strong>axis_label</strong> (<em>Boolean</em><em>, </em><em>default=True</em>) – Whether or not to label the cluster plot with each cluster’s
+number</li>
+<li><strong>save</strong> (<em>Boolean</em><em>, </em><em>default=False</em>) – Whether or not to save the resulting silhouette plot</li>
+<li><strong>save_name</strong> (<em>String</em>) – The saved filename</li>
+<li><strong>x_label</strong> (<em>String</em>) – The x axis label for the plot</li>
+<li><strong>avg_pos</strong> (<em>float</em>) – Where to position the text for the average silghouette score
+relative to the position of the “average” line</li>
+<li><strong>w</strong> (<em>float</em><em> or </em><em>int</em>) – width of plot</li>
+<li><strong>h</strong> (<em>float</em><em> or </em><em>int</em>) – height of plot</li>
 </ul>
 </td>
 </tr>
@@ -524,18 +504,49 @@ AgglomerativeClustering, KMeans or similar</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>X</strong> (<em>features</em>) – </li>
-<li><strong>range_n_clusters</strong> (<em>the range of clusters you want</em><em>, </em><em>e.g.</em><em> [</em><em>2</em><em>,</em><em>3</em><em>,</em><em>4</em><em>,</em><em>5</em><em>,</em><em>10</em><em>,</em><em>20</em><em>]</em>) – </li>
-<li><strong>clust</strong> (<em>the sklearn clusterer to use</em><em>, </em><em>e.g. KMeans</em>) – </li>
+<li><strong>X</strong> (<em>np.array</em><em> or </em><em>list-like</em>) – Features (possibly <code class="docutils literal notranslate"><span class="pre">feature_array</span></code> - need to check!)</li>
+<li><strong>range_n_clusters</strong> (<em>list-like</em>) – The range of clusters you want, e.g. [2,3,4,5,10,20]</li>
+<li><strong>clust</strong> (<em>sklearn clusterer</em>) – the sklearn clusterer to use, e.g. KMeans</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
 <li><strong>cluster_labels</strong> (<em>numpy.ndarray</em>) – The labels for the clusters, with each one corresponding to a feature
-vector in X</li>
-<li><em>also prints the silhouette analysis</em></li>
+vector in <code class="docutils literal notranslate"><span class="pre">X</span></code>.</li>
+<li><em>Also prints the silhouette analysis</em></li>
 </ul>
 </p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="wtphm.batch_clustering.cluster_times">
+<code class="descclassname">wtphm.batch_clustering.</code><code class="descname">cluster_times</code><span class="sig-paren">(</span><em>batch_data</em>, <em>cluster_labels</em>, <em>assoc_batch</em>, <em>event_dur_type='down_dur'</em><span class="sig-paren">)</span><a class="headerlink" href="#wtphm.batch_clustering.cluster_times" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a DataFrame with a summary of the size and durations of batch
+members</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>batch_data</strong> (<em>pandas.DataFrame</em>) – The dataframe holding the indices in <code class="docutils literal notranslate"><span class="pre">event_data</span></code> and start and end
+times for each batch</li>
+<li><strong>cluster_labels</strong> (<em>numpy.ndarray</em>) – The labels for the clusters, with each one corresponding to a feature
+vector in <code class="docutils literal notranslate"><span class="pre">assoc_batch</span></code></li>
+<li><strong>assoc_batch</strong> (<em>nunmpy.ndarray</em>) – Indices of batches associated with each <code class="docutils literal notranslate"><span class="pre">feature_array</span></code>. Obtained
+from <a class="reference internal" href="#wtphm.batch_clustering.get_batch_features" title="wtphm.batch_clustering.get_batch_features"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_batch_features()</span></code></a></li>
+<li><strong>event_dur_type</strong> (<em>string</em>) – The event group duration in batch_data to return, i.e. either
+‘fault_dur’ or ‘down_dur’. ‘down_dur’ means the entire time the turbine
+was offline, ‘fault_dur’ just means while the turbine was faulting. See
+<a class="reference internal" href="#wtphm.batch.Batches.get_batch_data" title="wtphm.batch.Batches.get_batch_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">wtphm.batch.Batches.get_batch_data()</span></code></a> for details</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>summary</strong> (<em>Pandas.DataFrame</em>) – The DataFrame has the total duration, mean duration, standard deviation
+of the duration and number of stoppages in each cluster.</p>
 </td>
 </tr>
 </tbody>
@@ -557,7 +568,7 @@ as a child event) has been triggered by any A events.</p>
 <code class="descclassname">wtphm.event_probs.</code><code class="descname">get_trig_summary</code><span class="sig-paren">(</span><em>events</em>, <em>codes</em>, <em>tsa_op1='ge'</em>, <em>tsa_op2='le'</em>, <em>t_hi=0.9</em>, <em>t_lo=0.1</em><span class="sig-paren">)</span><a class="headerlink" href="#wtphm.event_probs.get_trig_summary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets probabilities that pairs of events will trigger one another, and
 the derived relationship between these pairs</p>
-<p>get_trig_summary takes a list of event codes. It finds all combinations of
+<p>This function takes a list of event codes. It finds all combinations of
 pairs of codes from this and splits them into “A” and “B” codes. It then
 counts the number of events with code A which have triggered one or more
 events with code B and vice-versa. It then computes a probability that if
@@ -574,70 +585,71 @@ end time of event B, respectively.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>events</strong> (<em>pandas.DataFrame</em>) – The events data from a wind turbine. Must be free of NA values.</li>
 <li><strong>codes</strong> (<em>list-like</em>) – The event codes to look at</li>
-<li><strong>tsa_op1</strong> (<em>String</em><em> (</em><em>default 'ge'</em><em>)</em>) – Operator to use for T_s_A &gt;= T_s_B or T_s_A &gt; T_s_B. Can be one of:
-‘ge’: &lt;=
-‘gt’: &lt;</li>
+<li><strong>tsa_op1</strong> (<em>String</em><em>, </em><em>default 'ge'</em>) – <p>Operator to use for T_s_A &gt;= T_s_B or T_s_A &gt; T_s_B. Can be one of:</p>
+<p>’ge’: &lt;=
+‘gt’: &lt;</p>
+</li>
 <li><strong>tsa_op2</strong> (<em>String</em><em> (</em><em>default 'le'</em><em>)</em>) – Operator to use for T_s_A &lt;= T_e_B or T_s_A &lt; T_e_B. Can be one of:
 ‘le’: &gt;=
 ‘lt’: &gt;</li>
 <li><strong>t_hi</strong> (<em>float</em><em> (</em><em>default 0.9</em><em>)</em>) – Threshold of % of A events which trigger B events at or above which
-relationship 3 is true (or % B triggering A for relationship 4, or % of
-both for relationship 1). See ‘relationship’ in the returned
-trig_summary dataframe below.</li>
+relationship 3 is <code class="docutils literal notranslate"><span class="pre">True</span></code> (or % B triggering A for relationship 4, or
+% of both for relationship 1). See ‘relationship’ in the returned
+<code class="docutils literal notranslate"><span class="pre">trig_summary</span></code> dataframe below.</li>
 <li><strong>t_low</strong> (<em>float</em><em> (</em><em>default 0.1</em><em>)</em>) – Threshold of % of A events which trigger B events (or vice-versa) at or
-below which relationship 2 is true. See ‘relationship’ in the returned
-trig_summary dataframe below.</li>
+below which relationship 2 is <code class="docutils literal notranslate"><span class="pre">True</span></code>. See ‘relationship’ in the
+returned <code class="docutils literal notranslate"><span class="pre">trig_summary</span></code> dataframe below.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><p><strong>trig_summary</strong> (<em>Pandas.DataFrame</em>) – A matrix consisting of the following:
-A_code: the event code of the “A” events
-A_desc: description of the “A” events
-B_code: the event code of the “B” events
-B_desc: description of the “B” events
-A_count: number of “A” events in the data
-A_trig_B_count: number of “A” events which trigger one or more “B”</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><p><strong>trig_summary</strong> (<em>Pandas.DataFrame</em>) – A matrix consisting of the following:</p>
+<ul>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">A_code</span></code>: the event code of the “A” events</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">A_desc</span></code>: description of the “A” events</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">B_code</span></code>: the event code of the “B” events</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">B_desc</span></code>: description of the “B” events</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">A_count</span></code>: number of “A” events in the data</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">A_trig_B_count</span></code>: number of “A” events which trigger one or more “B”
+events</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">A_trig_B_prob</span></code>: ratio of “A” events which have triggered one or
+more
+“B” events, to the total number of “A” events</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">B_count</span></code>: Number of “B” events in the data</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">B_trig_A_count</span></code>: number of “B” events which trigger one or more “A”
+events</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">B_trig_A_prob</span></code>: ratio of “B” events which have triggered one or
+more
+“A” events, to the total number of “B” events</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">relationship</span></code>: Number 1-5 indicating the relationship events A have
+to events B:</p>
 <blockquote>
-<div><p>events</p>
+<div><ol class="arabic simple">
+<li>High proportion of As trigger Bs &amp; high proportion of Bs trigger
+As. Alarm A &amp; B usually appear together; A ~= B</li>
+<li>Low proportion of As trigger Bs &amp; low proportion of Bs
+trigger As. A &amp; B never or rarely appear together; A n B ~= 0</li>
+<li>High proportion of As trigger Bs &amp; less than high proportion of
+Bs trigger As. B will usually be triggered whenever alarm A
+appears - B is a more general alarm; A e B</li>
+<li>High proportion of Bs trigger As &amp; less than high proportion
+of As trigger Bs. A will usually be triggered whenever alarm B
+appears - A is a more general alarm; B e A</li>
+<li>None of the above. The two alarms are randomly or somewhat
+related; A n B != 0</li>
+</ol>
 </div></blockquote>
-<p>A_trig_B_prob: ratio of “A” events which have triggered one or more “B”
-events, to the total number of “A” events
-B_count: Number of “B” events in the data
-B_trig_A_count: number of “B” events which trigger one or more “A”</p>
-<blockquote>
-<div><p>events</p>
-</div></blockquote>
-<dl class="docutils">
-<dt>B_trig_A_prob: ratio of “B” events which have triggered one or more “A”</dt>
-<dd><p class="first last">events, to the total number of “B” events</p>
-</dd>
-<dt>relationship: Number 1-5 indicating the relationship events A have to</dt>
-<dd><dl class="first last docutils">
-<dt>events B:</dt>
-<dd><dl class="first last docutils">
-<dt>1: High proportion of As trigger Bs &amp; high proportion of Bs</dt>
-<dd><p class="first last">trigger As. Alarm A &amp; B usually appear together; A ~= B</p>
-</dd>
-<dt>2: Low proportion of As trigger Bs &amp; low proportion of Bs</dt>
-<dd><p class="first last">trigger As. A &amp; B never or rarely appear together;
-A n B ~= 0</p>
-</dd>
-<dt>3: High proportion of As trigger Bs &amp; less than high proportion</dt>
-<dd><p class="first last">of Bs trigger As. B will usually be triggered whenever alarm
-A appears - B is a more general alarm; A e B</p>
-</dd>
-<dt>4: High proportion of Bs trigger As &amp; less than high proportion</dt>
-<dd><p class="first last">of As trigger Bs. A will usually be triggered whenever alarm
-B appears - A is a more general alarm; B e A</p>
-</dd>
-<dt>5: None of the above. The two alarms are randomly or somewhat</dt>
-<dd><p class="first last">related; A n B != 0</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-</dl>
+</li>
+</ul>
 </p>
 </td>
 </tr>
@@ -649,12 +661,50 @@ reliability. Wind Energy, 15(8), 951–966. <a class="reference external" href="
 </dd></dl>
 
 <dl class="function">
+<dt id="wtphm.event_probs.short_summary">
+<code class="descclassname">wtphm.event_probs.</code><code class="descname">short_summary</code><span class="sig-paren">(</span><em>trig_summary</em>, <em>codes</em>, <em>t=0.7</em><span class="sig-paren">)</span><a class="headerlink" href="#wtphm.event_probs.short_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an even more summarised version of trig_summary, showing
+important relationships</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>trig_summary</strong> (<em>Pandas.DataFrame</em>) – Must be the <code class="docutils literal notranslate"><span class="pre">trig_summary</span></code> obtained from <a class="reference internal" href="#wtphm.event_probs.get_trig_summary" title="wtphm.event_probs.get_trig_summary"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_trig_summary()</span></code></a></li>
+<li><strong>codes</strong> (<em>int</em><em>, </em><em>list</em>) – A single, or list of, event code(s) of interest, i.e. the events that
+trigger other events</li>
+<li><strong>t</strong> (<em>float</em>) – The threshold for a ‘significant’ relationship. E.g., if t=0.7, only
+events that trigger other events with a probability &gt;= 0.7 will be
+displayed.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>df</strong> (<em>Pandas.DataFrame</em>)</li>
+<li><em>A dataframe consisting of the following</em> –<ul>
+<li><code class="docutils literal notranslate"><span class="pre">parent_code</span></code>: the triggering events code</li>
+<li><code class="docutils literal notranslate"><span class="pre">child_code</span></code>: the triggered events code</li>
+<li><code class="docutils literal notranslate"><span class="pre">trig_prob</span></code>: the probability that <code class="docutils literal notranslate"><span class="pre">parent_code</span></code> events will
+trigger <code class="docutils literal notranslate"><span class="pre">child_code</span></code> events</li>
+<li><code class="docutils literal notranslate"><span class="pre">trig_count</span></code>: the count of <code class="docutils literal notranslate"><span class="pre">parent_code</span></code> events which have
+triggered <code class="docutils literal notranslate"><span class="pre">child_code</span></code> events</li>
+</ul>
+</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="wtphm.event_probs.get_trig_summary_verbose">
 <code class="descclassname">wtphm.event_probs.</code><code class="descname">get_trig_summary_verbose</code><span class="sig-paren">(</span><em>events</em>, <em>codes</em>, <em>tsa_op1='ge'</em>, <em>tsa_op2='le'</em><span class="sig-paren">)</span><a class="headerlink" href="#wtphm.event_probs.get_trig_summary_verbose" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets probabilities that certain events will trigger others, and that
-certain events will be triggered _by_ others. Can be calculated via
+certain events will be triggered <em>by</em> others. Can be calculated via
 a duration-based method, or straightforward count.</p>
-<p>trig_probs takes a list of event codes. It creates two separate sets of
+<p>This takes a list of event codes. It creates two separate sets of
 “parent” and “child” events, with all the parent events having the same
 event code and all the child events having another event code (though it
 does not necessarily have to be different). It then iterates through every
@@ -663,8 +713,6 @@ events. It counts the number of parent events which have triggered one or
 more child events for each event code. It also gives a probability that any
 new parent event will trigger a child event by finding the ratio of parent
 events which have triggered a child event to those which haven’t.</p>
-<p>Instead of finding a simple count of triggering events, calc_child can find
-the duration of events through the calc_type argument.</p>
 <p>Event A is triggered by Event B if:</p>
 <p>T_s_A &gt;= T_s_B &amp; T_s_A &lt;= T_e_B</p>
 <p>where T_s_A, T_s_B and T_e_B are the start time of events A and B, and the
@@ -685,68 +733,24 @@ end time of event B, respectively.</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><p><strong>trig_summary</strong> (<em>Pandas.DataFrame</em>) – A matrix consisting of the following:
-parent_event: the event code of the parent event
-parent_desc: description of the parent event
-p_count: total number of parent events matching the event code
-p_dur: total duration of parent events matching the event code
-p_trig_count: number of parent events which have triggered child events
-p_trig_dur: duration of parent events which have triggered child events
-child_event: the event code of the child event
-child_desc: description of the child event
-c_count: total number of child events matching the event code
-c_dur: total duration of child events matching the event code
-c_trig_count: number of child events which have been triggered by</p>
-<blockquote>
-<div><p>parent events</p>
-</div></blockquote>
-<dl class="docutils">
-<dt>c_trig_dur: duration of child events which have been triggered by</dt>
-<dd><p class="first last">parent events</p>
-</dd>
-</dl>
-</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="wtphm.event_probs.short_summary">
-<code class="descclassname">wtphm.event_probs.</code><code class="descname">short_summary</code><span class="sig-paren">(</span><em>trig_summary</em>, <em>codes</em>, <em>t=0.7</em><span class="sig-paren">)</span><a class="headerlink" href="#wtphm.event_probs.short_summary" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an even more summarised version of trig_summary, showing
-important relationships</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>trig_summary</strong> (<em>Pandas.DataFrame</em>) – Must be the trig_summary obtained from get_trig_summary function in
-this module</li>
-<li><strong>codes</strong> (<em>int</em><em>, </em><em>list</em>) – A single, or list of, event code(s) of interest, i.e. the events that
-trigger other events</li>
-<li><strong>t</strong> (<em>float</em>) – The threshold for a ‘significant’ relationship. E.g., if t=0.7, only
-events that trigger other events with a probability &gt;= 0.7 will be
-displayed.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul>
-<li><p class="first"><strong>df</strong> (<em>Pandas.DataFrame</em>)</p>
-</li>
-<li><p class="first"><em>A dataframe consisting of the following</em> – parent_code: the triggering events code
-child_code: the triggered events code
-trig_prob: the probability that parent_code events will trigger</p>
-<blockquote>
-<div><p>child_code events</p>
-</div></blockquote>
-<dl class="docutils">
-<dt>trig_count: the count of parent_code events which have triggered</dt>
-<dd><p class="first last">child_code events</p>
-</dd>
-</dl>
-</li>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><p><strong>trig_summary</strong> (<em>Pandas.DataFrame</em>) – A matrix consisting of the following:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">parent_event</span></code>: the event code of the parent event</li>
+<li><code class="docutils literal notranslate"><span class="pre">parent_desc</span></code>: description of the parent event</li>
+<li><code class="docutils literal notranslate"><span class="pre">p_count</span></code>: total number of parent events matching the event code</li>
+<li><code class="docutils literal notranslate"><span class="pre">p_dur</span></code>: total duration of parent events matching the event code</li>
+<li><code class="docutils literal notranslate"><span class="pre">p_trig_count</span></code>: number of parent events which have triggered child
+events</li>
+<li><code class="docutils literal notranslate"><span class="pre">p_trig_dur</span></code>: duration of parent events which have triggered child
+events</li>
+<li><code class="docutils literal notranslate"><span class="pre">child_event</span></code>: the event code of the child event</li>
+<li><code class="docutils literal notranslate"><span class="pre">child_desc</span></code>: description of the child event</li>
+<li><code class="docutils literal notranslate"><span class="pre">c_count</span></code>: total number of child events matching the event code</li>
+<li><code class="docutils literal notranslate"><span class="pre">c_dur</span></code>: total duration of child events matching the event code</li>
+<li><code class="docutils literal notranslate"><span class="pre">c_trig_count</span></code>: number of child events which have been triggered by
+parent events</li>
+<li><code class="docutils literal notranslate"><span class="pre">c_trig_dur</span></code>: duration of child events which have been triggered by
+parent events</li>
 </ul>
 </p>
 </td>
@@ -758,53 +762,50 @@ trig_prob: the probability that parent_code events will trigger</p>
 </div>
 <div class="section" id="module-wtphm.scada_labelling">
 <span id="wtphm-scada-labelling-module"></span><h2>wtphm.scada_labelling module<a class="headerlink" href="#module-wtphm.scada_labelling" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="wtphm.scada_labelling.BasicFeature">
-<em class="property">class </em><code class="descclassname">wtphm.scada_labelling.</code><code class="descname">BasicFeature</code><span class="sig-paren">(</span><em>feature_list</em><span class="sig-paren">)</span><a class="headerlink" href="#wtphm.scada_labelling.BasicFeature" title="Permalink to this definition">¶</a></dt>
-<dd><p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_transform</span></code>(X[,&nbsp;y])</td>
-<td>Fit to data, then transform it.</td>
-</tr>
-</tbody>
-</table>
-<table border="1" class="docutils">
-<colgroup>
-<col width="57%" />
-<col width="43%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><strong>fit</strong></td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td><strong>transform</strong></td>
-<td>&#160;</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 <dl class="function">
-<dt id="wtphm.scada_labelling.balanced_subsample">
-<code class="descclassname">wtphm.scada_labelling.</code><code class="descname">balanced_subsample</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>maj_class=0</em>, <em>multiple=1</em><span class="sig-paren">)</span><a class="headerlink" href="#wtphm.scada_labelling.balanced_subsample" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a balanced training set by randomly undersampling the majority
-class</p>
+<dt id="wtphm.scada_labelling.label_stoppages">
+<code class="descclassname">wtphm.scada_labelling.</code><code class="descname">label_stoppages</code><span class="sig-paren">(</span><em>scada_data, fault_batches, drop_fault_batches=True, label_pre_stop=True, pre_stop_lims=['90 minutes', 0], batches_to_drop=None, drop_type=None</em><span class="sig-paren">)</span><a class="headerlink" href="#wtphm.scada_labelling.label_stoppages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Label times in the scada data which occurred during a stoppage and
+leading up to a stoppage as such.</p>
+<p>This adds a column to the passed <code class="docutils literal notranslate"><span class="pre">scada_data</span></code>, <code class="docutils literal notranslate"><span class="pre">stoppage</span></code>, and an
+optional column <code class="docutils literal notranslate"><span class="pre">pre_stop</span></code>. <code class="docutils literal notranslate"><span class="pre">stoppage</span></code> is given a 1 if the scada point
+in question occurs during a stoppage, and <code class="docutils literal notranslate"><span class="pre">pre_stop</span></code> is given a 1 in the
+samples leading up to the stoppage. Both are 0 otherwise. These vary under
+different circumstances (see below).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>x</strong> (<em>np.ndarray</em><em> or </em><em>pd.DataFrame</em>) – The training data (features)</li>
-<li><strong>y</strong> (<em>np.ndarray</em><em> or </em><em>pd.DataFrame</em>) – The target values</li>
-<li><strong>maj_class</strong> (<em>int</em>) – The y-value of the majority class</li>
-<li><strong>multiple</strong> (<em>int</em>) – Multiple of undersampled majority class values to select. E.g. if set to
-2, then no. of samples will be 2*number of next largest class</li>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>scada_data</strong> (<em>pandas.DataFrame</em>) – Full set of SCADA data for the turbine.</li>
+<li><strong>fault_batches</strong> (<em>pandas.DataFrame</em>) – The dataframe holding the indices in event_data and start and end times
+for each batch (each batch related to a stoppage).</li>
+<li><strong>drop_fault_batches</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Whether to drop the actual entries which correspond to the batches, i.e.
+not the pre-fault data, but the fault data itself. This is highly
+recommended, as otherwise the stoppages themselves will be kept in the
+returned data, though the <code class="docutils literal notranslate"><span class="pre">stoppage</span></code> label for these entries will be
+labelled as “1”, while the fault-free data will be labelled “0”.</li>
+<li><strong>label_pre_stop</strong> (<em>bool; default=True</em>) – If True, add a column to the returned <code class="docutils literal notranslate"><span class="pre">scada_data_l</span></code> for <code class="docutils literal notranslate"><span class="pre">pre_stop</span></code>.
+Samples in the time leading up to a stoppage are given label 1, and 0
+otherwise.</li>
+<li><strong>pre_stop_lims</strong> (<em>2*1 list of pd.Timedelta strs</em><em>, </em><em>default=</em><em>[</em><em>'90 mins'</em><em>, </em><em>0</em><em>]</em>) – The amount of time before a stoppage to label scada as <code class="docutils literal notranslate"><span class="pre">pre_stop</span></code>.
+E.g., by default, <code class="docutils literal notranslate"><span class="pre">pre_stop</span></code> is labelled as 1 in the time between 90
+mins and 0 mins before the stoppage occurs. If [‘120 mins’, ‘20 mins’]
+is passed, scada samples from 120 minutes before until 20 minutes before
+the stoppage are given the <code class="docutils literal notranslate"><span class="pre">pre_stop</span></code> label 1.</li>
+<li><strong>batches_to_drop</strong> (<em>pd.DataFrame</em><em>, </em><em>optional; default=None</em>) – Additional batches which should be dropped from the scada data. If this
+is passed, <code class="docutils literal notranslate"><span class="pre">drop_type</span></code> must be given a string as well.</li>
+<li><strong>drop_type</strong> (<em>str</em><em>, </em><em>optional; default=None</em>) – Only used when <code class="docutils literal notranslate"><span class="pre">batches_to_drop</span></code> has been passed.
+If ‘both’, the stoppage and pre-stop entries (according to
+pre_stop_lims) corresponding to batches in <code class="docutils literal notranslate"><span class="pre">batches_to_drop</span></code> are
+dropped from the scada data.
+If ‘stop’, only the stoppage entries are dropped
+If ‘pre’, opnly the pre-stop entries are dropped</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>scada_data_l</strong> (<em>pd.DataFrame</em>) – The original scada_data dataframe with the <code class="docutils literal notranslate"><span class="pre">pre_stop</span></code>, <code class="docutils literal notranslate"><span class="pre">stoppage</span></code>
+and <code class="docutils literal notranslate"><span class="pre">batch_id</span></code> columns added</p>
 </td>
 </tr>
 </tbody>
@@ -829,59 +830,13 @@ features will be added to X at T for B&#64;(T-1), B&#64;(T-2)…B&#64;(T-steps).
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
-<li><strong>X_lagged</strong> (<em>np.ndarray</em>) – An array with the original features and lagged features appended</li>
-<li><em>y_lagged</em></li>
+<li><strong>X_lagged</strong> (<em>np.ndarray</em>) – An array with the original features and lagged features appended. The
+number of samples will necessarily be decreased because there will be
+some samples at the start with NA values for features.</li>
+<li><strong>y_lagged</strong> (<em>np.ndarray</em>) – An updated array of target vaues corresponding to the new number of
+samples in <code class="docutils literal notranslate"><span class="pre">X_lagged</span></code></li>
 </ul>
 </p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="wtphm.scada_labelling.label_stoppages">
-<code class="descclassname">wtphm.scada_labelling.</code><code class="descname">label_stoppages</code><span class="sig-paren">(</span><em>scada_data, fault_batches, drop_fault_batches=True, label_pre_stop=True, pre_stop_lims=['90 minutes', 0], batches_to_drop=None, drop_type=None</em><span class="sig-paren">)</span><a class="headerlink" href="#wtphm.scada_labelling.label_stoppages" title="Permalink to this definition">¶</a></dt>
-<dd><p>Label times in the scada data which occurred during a stoppage and
-leading up to a stoppage as such.</p>
-<p>This adds a column to the passed <cite>scada_data</cite>, “stoppage”, and an optional
-column “pre_stop”. “stoppage” is given a 1 if the scada point in question
-occurs during a stoppage, and “pre_stop” is given a 1 in the samples leading
-up to the stoppage. Both are 0 otherwise. These vary under different
-circumstances (see below).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>scada_data</strong> (<em>pandas.DataFrame</em>) – Full set of SCADA data for the turbine.</li>
-<li><strong>fault_batches</strong> (<em>pandas.DataFrame</em>) – The dataframe holding the indices in event_data and start and end times
-for each batch (each batch related to a stoppage).</li>
-<li><strong>drop_fault_batches</strong> (<em>bool; default=True</em>) – Whether to drop the actual entries which correspond to the batches, i.e.
-not the pre-fault data, but the fault data itself. This is highly
-recommended, as otherwise the stoppages themselves will be kept in the
-returned data, though the “stoppage” label for these entries will be
-labelled as “1”, while the fault-free data will be labelled “0”.</li>
-<li><strong>label_pre_stop</strong> (<em>bool; default=True</em>) – If True, add a column to the returned scada_data_l for pre_stop. Samples
-in the time leading up to a stoppage are given label 1, and 0 otherwise.</li>
-<li><strong>pre_stop_lims</strong> (<em>2*1 list of pd.Timedelta strs; default=</em><em>[</em><em>'90 mins'</em><em>, </em><em>0</em><em>]</em>) – The amount of time before a stoppage to label scada as pre_stop. E.g.,
-<cite>pre_stop</cite> is labelled as 1 in the time between 90 mins and 0 mins
-before the stoppage occurs. [‘120 mins’, ‘20 mins’] would give scada
-samples from 120 minutes before until 20 minutes before the stoppage the
-pre_stop label 1.</li>
-<li><strong>batches_to_drop</strong> (<em>pd.DataFrame</em><em>, </em><em>optional; default=None</em>) – Additional batches which should be dropped from the scada data. If this
-is passed, drop_type must be given a string as well.</li>
-<li><strong>drop_type</strong> (<em>str</em><em>, </em><em>optional; default=None</em>) – Only used when batches_to_drop has been passed.
-If ‘both’, the stoppage and pre-stop entries (according to
-pre_stop_lims) corresponding to batches in batches_to_drop are dropped
-from the scada data.
-If ‘stop’, only the stoppage entries are dropped
-If ‘pre’, opnly the pre-stop entries are dropped</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>scada_data_l</strong> (<em>pd.DataFrame</em>) – The original scada_data dataframe with the <cite>pre_stop</cite>, <cite>stoppage</cite> and
-<cite>batch_id</cite> columns added</p>
 </td>
 </tr>
 </tbody>

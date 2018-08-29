@@ -9,5 +9,8 @@ Workflow:
 * copy and paste relevant parts of "wtphm.rst" into "index.rst" and then delete "wtphm.rst"
 	- edited wtphm by removing :show-inheritance:. This stops the class inheritance from being listed in the docs, which isn't really too relevant anyway
 	- edited wtphm to remove "submodules" heading, as it seemed to be redundant given that all headings below it are at the same level
+	- edited conf.py with autodoc_member_order and napoleon_numpy_docstring
+
+* included a rtd_requirements.txt file in the docs folder for read the docs requirements (i.e. numpydoc).
 
 Should then build!

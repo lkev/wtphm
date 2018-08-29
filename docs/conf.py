@@ -42,14 +42,15 @@ release = ''
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
+    # 'numpydoc',
     'sphinx.ext.napoleon',
-    'numpydoc'
 ]
 
 napoleon_numpy_docstring = True
 napoleon_use_rtype = False
 # napoleon_use_ivar = True
 autodoc_member_order = 'bysource'
+# numpydoc_show_class_members = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

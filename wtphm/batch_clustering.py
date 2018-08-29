@@ -83,6 +83,7 @@ def get_batch_features(event_data, fault_codes, batch_data, method, lo=1,
         ``feature_array``'s index in ``batch_data``, which in turn contains the
         index of the ``feature_array``'s associated events in the original
         ``events_data`` or ``fault_data``.
+
     """
 
     if event_type == 'fault_events':

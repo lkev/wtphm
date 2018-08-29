@@ -1,0 +1,16 @@
+pandas
+numpy
+sklearn
+sklearn.cluster
+sklearn.metrics
+sklearn.neighbors
+matplotlib
+matplotlib.pyplot
+matplotlib.cm
+matplotlib.gridspec
+itertools
+itertools.chain
+wtphm
+scipy.ndimage.interpolation
+warnings
+operator

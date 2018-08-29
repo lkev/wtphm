@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.base import TransformerMixin
+# from sklearn.base import TransformerMixin
 # from .batch_clustering import investigate_label
 import pandas as pd
 from scipy.ndimage.interpolation import shift

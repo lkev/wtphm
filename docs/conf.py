@@ -66,4 +66,5 @@ html_static_path = ['_static']
 # The below are the main requirements of the project. They are not actually
 # needed to build the docs so are saved here as fake packages.
 autodoc_mock_imports = [
-    "matplotlib", "numpy", "sklearn", "pandas", "operator", "warning"]
+    "matplotlib", "numpy", "sklearn", "pandas", "operator", "warning",
+    "scipy", "math", "itertools"]

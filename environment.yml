@@ -145,5 +145,3 @@ dependencies:
   - conda-forge/noarch::missingno==0.4.2=py_1
   - xlsxwriter
   - sphinx
-prefix: C:\Users\leahy\Miniconda3\envs\stenv
-

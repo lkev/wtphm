@@ -52,36 +52,36 @@ def get_trig_summary(events, codes, tsa_op1='ge', tsa_op2='le',
         'lt': >
     t_hi: float (default 0.9)
         Threshold of % of A events which trigger B events at or above which
-        relationship 3 is ``True`` (or % B triggering A for relationship 4, or
+        relationship 3 is `True` (or % B triggering A for relationship 4, or
         % of both for relationship 1). See 'relationship' in the returned
-        ``trig_summary`` dataframe below.
+        `trig_summary` dataframe below.
     t_low: float (default 0.1)
         Threshold of % of A events which trigger B events (or vice-versa) at or
-        below which relationship 2 is ``True``. See 'relationship' in the
-        returned ``trig_summary`` dataframe below.
+        below which relationship 2 is `True`. See 'relationship' in the
+        returned `trig_summary` dataframe below.
 
     Returns
     -------
     trig_summary : Pandas.DataFrame
         A matrix consisting of the following:
 
-        * ``A_code``: the event code of the "A" events
-        * ``A_desc``: description of the "A" events
-        * ``B_code``: the event code of the "B" events
-        * ``B_desc``: description of the "B" events
-        * ``A_count``: number of "A" events in the data
-        * ``A_trig_B_count``: number of "A" events which trigger one or more "B"
+        * `A_code`: the event code of the "A" events
+        * `A_desc`: description of the "A" events
+        * `B_code`: the event code of the "B" events
+        * `B_desc`: description of the "B" events
+        * `A_count`: number of "A" events in the data
+        * `A_trig_B_count`: number of "A" events which trigger one or more "B"
           events
-        * ``A_trig_B_prob``: ratio of "A" events which have triggered one or
+        * `A_trig_B_prob`: ratio of "A" events which have triggered one or
           more
           "B" events, to the total number of "A" events
-        * ``B_count``: Number of "B" events in the data
-        * ``B_trig_A_count``: number of "B" events which trigger one or more "A"
+        * `B_count`: Number of "B" events in the data
+        * `B_trig_A_count`: number of "B" events which trigger one or more "A"
           events
-        * ``B_trig_A_prob``: ratio of "B" events which have triggered one or
+        * `B_trig_A_prob`: ratio of "B" events which have triggered one or
           more
           "A" events, to the total number of "B" events
-        * ``relationship``: Number 1-5 indicating the relationship events A have
+        * `relationship`: Number 1-5 indicating the relationship events A have
           to events B:
             1. High proportion of As trigger Bs & high proportion of Bs trigger
                As. Alarm A & B usually appear together; A ~= B
@@ -212,7 +212,7 @@ def short_summary(trig_summary, codes, t=0.7):
     Args
     ----
     trig_summary: Pandas.DataFrame
-        Must be the ``trig_summary`` obtained from :func:`.get_trig_summary`
+        Must be the `trig_summary` obtained from :func:`.get_trig_summary`
     codes: int, list
         A single, or list of, event code(s) of interest, i.e. the events that
         trigger other events
@@ -225,12 +225,12 @@ def short_summary(trig_summary, codes, t=0.7):
     df: Pandas.DataFrame
     A dataframe consisting of the following:
 
-        * ``parent_code``: the triggering events code
-        * ``child_code``: the triggered events code
-        * ``trig_prob``: the probability that ``parent_code`` events will
-          trigger ``child_code`` events
-        * ``trig_count``: the count of ``parent_code`` events which have
-          triggered ``child_code`` events
+        * `parent_code`: the triggering events code
+        * `child_code`: the triggered events code
+        * `trig_prob`: the probability that `parent_code` events will
+          trigger `child_code` events
+        * `trig_count`: the count of `parent_code` events which have
+          triggered `child_code` events
     """
     cols = ['parent_code', 'child_code', 'trig_prob', 'trig_count']
     df = pd.DataFrame(columns=cols)
@@ -300,28 +300,28 @@ def get_trig_summary_verbose(events, codes, tsa_op1='ge', tsa_op2='le'):
     trig_summary : Pandas.DataFrame
         A matrix consisting of the following:
 
-        * ``parent_event``: the event code of the parent event
-        * ``parent_desc``: description of the parent event
-        * ``p_count``: total number of parent events matching the event code
-        * ``p_dur``: total duration of parent events matching the event code
-        * ``p_trig_count``: number of parent events which have triggered child
+        * `parent_event`: the event code of the parent event
+        * `parent_desc`: description of the parent event
+        * `p_count`: total number of parent events matching the event code
+        * `p_dur`: total duration of parent events matching the event code
+        * `p_trig_count`: number of parent events which have triggered child
           events
-        * ``p_trig_dur``: duration of parent events which have triggered child
+        * `p_trig_dur`: duration of parent events which have triggered child
           events
-        * ``child_event``: the event code of the child event
-        * ``child_desc``: description of the child event
-        * ``c_count``: total number of child events matching the event code
-        * ``c_dur``: total duration of child events matching the event code
-        * ``c_trig_count``: number of child events which have been triggered by
+        * `child_event`: the event code of the child event
+        * `child_desc`: description of the child event
+        * `c_count`: total number of child events matching the event code
+        * `c_dur`: total duration of child events matching the event code
+        * `c_trig_count`: number of child events which have been triggered by
           parent events
-        * ``c_trig_dur``: duration of child events which have been triggered by
+        * `c_trig_dur`: duration of child events which have been triggered by
           parent events
 
     """
     if events[['turbine_num', 'time_on', 'code', 'description', 'category',
                'type', 'power', 'wind_speed', 'gen_speed', 'time_off',
                'duration']].isnull().values.any():
-            raise ValueError("the events data passed has NaN values in it")
+        raise ValueError("the events data passed has NaN values in it")
 
     trig_summary = pd.DataFrame(columns=[
         'parent_event', 'parent_desc', 'p_count', 'p_dur', 'p_trig_count',
@@ -385,13 +385,13 @@ def get_trig_summary_verbose(events, codes, tsa_op1='ge', tsa_op2='le'):
             trig_summary.loc[i, 'p_prob_count'] = p_trig_count / p_count
             try:
                 trig_summary.loc[i, 'p_prob_dur'] = p_trig_dur / p_dur
-            except:
+            except:  # noqa
                 trig_summary.loc[i, 'p_prob_dur'] = 0
 
             trig_summary.loc[i, 'c_prob_count'] = c_trig_count / c_count
             try:
                 trig_summary.loc[i, 'c_prob_dur'] = c_trig_dur / c_dur
-            except:
+            except:  # noqa
                 trig_summary.loc[i, 'c_prob_dur'] = 0
 
             trig_indices[parent_code, child_code] = {

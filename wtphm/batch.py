@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from itertools import chain
 # import warnings
-from . import batch_clustering
+from wtphm.clustering import batch_clustering
 
 
 class Batches:
@@ -21,10 +21,10 @@ class Batches:
         manipulation performed in this class; other headings may be required for
         other analyses):
 
-        * ``code``: There are a set list of events which can occur on the
+        * `code`: There are a set list of events which can occur on the
           turbine. Each one of these has an event code.
-        * ``description``: Each event code also has an associated description
-        * ``time_on``: The start time of the event
+        * `description`: Each event code also has an associated description
+        * `time_on`: The start time of the event
 
     fault_codes : numpy.ndarray
         All event codes that will be treated as fault events for the batches
@@ -34,7 +34,7 @@ class Batches:
         description so they are treated as the same event code during analysis.
         Must be in the form: '[[10, 11, 12], [24, 25], [56, 57, 58]]' or
         '[10, 11, 12]'. If this is passed, then the attributes
-        ``grouped_fault_codes`` and ``grouped_event_data`` become available.
+        `grouped_fault_codes` and `grouped_event_data` become available.
     ok_code : int, default=6
         A code which signifies the turbine returning to normal operation after
         being shut down or curtailed due to a fault or otherwise
@@ -42,15 +42,15 @@ class Batches:
     Attributes
     ----------
     fault_data : pandas.DataFrame
-        The subset of the events data with codes in ``fault_codes``
+        The subset of the events data with codes in `fault_codes`
     grouped_event_data : pandas.DataFrame
-        The ``event_data``, but with codes and descriptions from ``code_groups``
+        The `event_data`, but with codes and descriptions from `code_groups`
         changed so that similar ones are identical
     grouped_fault_data : pandas.DataFrame
-        The ``fault_data``, but with codes and descriptions from ``code_groups``
+        The `fault_data`, but with codes and descriptions from `code_groups`
         changed so that similar ones are identical
     grouped_fault_codes : pandas.DataFrame
-        The ``fault_codes``, but with the similar codes in each group treated as
+        The `fault_codes`, but with the similar codes in each group treated as
         identical
 
     """
@@ -85,13 +85,13 @@ class Batches:
         Returns
         -------
         grouped_event_data : pandas.DataFrame
-            The ``event_data``, but with codes and descriptions from
-            ``code_groups`` changed so that similar ones are identical
+            The `event_data`, but with codes and descriptions from
+            `code_groups` changed so that similar ones are identical
         grouped_fault_data : pandas.DataFrame
-            The ``fault_data``, but with codes and descriptions from
-            ``code_groups`` changed so that similar ones are identical
+            The `fault_data`, but with codes and descriptions from
+            `code_groups` changed so that similar ones are identical
         grouped_fault_codes : pandas.DataFrame
-            The ``fault_codes``, but with the similar codes in each group
+            The `fault_codes`, but with the similar codes in each group
             treated as identical
 
         """
@@ -170,48 +170,48 @@ class Batches:
 
     def get_batch_data(self, t_sep_lim='12 hour', groups=True):
         """
-        Get the distinct batches of events as they appear in the ``event_data``.
+        Get the distinct batches of events as they appear in the `event_data`.
 
         Each batch is a group of fault events. A batch always begins with a
-        fault event from one of the codes in ``fault_codes``, and ends with the
-        code ``ok_code``, which signifies the turbine returning to normal
+        fault event from one of the codes in `fault_codes`, and ends with the
+        code `ok_code`, which signifies the turbine returning to normal
         operation.
 
         Args
         ----
         t_sep_lim : str, default='1 hour', must be compatible with pd.Timedelta
-            If a batch ends, and a second batch begins less than ``t_sep_lim``
+            If a batch ends, and a second batch begins less than `t_sep_lim`
             afterwards, then the two batches are treated as one. It treats the
             the turbine coming back online and immediately faulting again as one
             continuous batch. This effect is stacked so that if a third fault
-            event happens less than ``t_sep_lim`` after the second, all three
+            event happens less than `t_sep_lim` after the second, all three
             are treated as the same continuous batch.
         groups: bool, default=True
             Whether or not the returned dataframe will group together similar
-            fault codes, as per ``grouped_fault_codes``.
+            fault codes, as per `grouped_fault_codes`.
 
         Returns
         -------
         batch_data : pd.DataFrame
             DataFrame with the following headings:
 
-            * ``turbine_num``: turbine number of the batch
-            * ``fault_start_codes``: the fault codes present at the first
+            * `turbine_num`: turbine number of the batch
+            * `fault_start_codes`: the fault codes present at the first
               timestamp in the batch
-            * ``all_start_codes``: all event start codes present at the first
+            * `all_start_codes`: all event start codes present at the first
               timestamp in the batch
-            * ``start_time``: start of first event in the batch
-            * ``fault_end_time``: ``time_on`` of the last fault event in the
+            * `start_time`: start of first event in the batch
+            * `fault_end_time`: `time_on` of the last fault event in the
               batch
-            * ``down_end_time``: the ``time_on`` of the last event in the batch,
-              i.e. the last ``ok_code`` event in the batch
-            * ``fault_dur``: duration from start of first fault event to start
+            * `down_end_time`: the `time_on` of the last event in the batch,
+              i.e. the last `ok_code` event in the batch
+            * `fault_dur`: duration from start of first fault event to start
               of final fault event in the batch
-            * ``down_dur``: duration of total downtime in the batch, i.e. from
-              start of first fault event to start of last ``ok_code`` event
-            * ``fault_event_ids``: indices in the events data of faults that
+            * `down_dur`: duration of total downtime in the batch, i.e. from
+              start of first fault event to start of last `ok_code` event
+            * `fault_event_ids`: indices in the events data of faults that
               occurred
-            * ``all_event_ids``: indices in the events data of all events (fault
+            * `all_event_ids`: indices in the events data of all events (fault
               or otherwise) that occurred during the batch
 
         """
@@ -344,17 +344,9 @@ class Batches:
         """Extract features from batches of events which appear during
         stoppages, to be used for clustering.
 
-        Only features from batches that comply with certain constraints are
-        included. These constraints are chosen depending on which feature
-        extraction method is used. Details of the feature extraction methods can
-        be found in [1].
-
-        **Note:** For each "batch" of alarms, there are up to ``num_codes``
-        unique alarm codes. Each alarm has an associated start time,
-        ``time_on``.
-
         This method is just a wrapper for
-        :func:`wtphm.batch_clustering.get_batch_features`.
+        :func:`wtphm.batch_clustering.get_batch_features`. More details in that
+        function.
 
         Args
         ----
@@ -362,43 +354,43 @@ class Batches:
             One of 'basic', 't_on', 'time'.
 
             basic:
-                * Only considers batches with between ``lo`` and ``hi``
+                * Only considers batches with between `lo` and `hi`
                   individual alarms.
-                * Array of zeros is filled with ``num`` corresponding to order
+                * Array of zeros is filled with `num` corresponding to order
                   of alarms' appearance.
                 * Does not take into account whether alarms occurred
                   simultaneously.
-                * Resultant vector of length ``num_codes * hi``
+                * Resultant vector of length `num_codes * hi`
             t_on:
-                * Only consider batches with between ``lo`` and ``hi``
-                  individual ``time_on``\s.
-                * For each ``time_on`` in each batch, an array of zeros is
+                * Only consider batches with between `lo` and `hi`
+                  individual `time_on`\s.
+                * For each `time_on` in each batch, an array of zeros is
                   filled with ones in places corresponding to an alarm that has
                   fired at that time.
-                * Results in a pattern array of length ``num_codes * hi``
+                * Results in a pattern array of length `num_codes * hi`
                   which shows the sequential order of the alarms which have been
                   fired.
             time:
                 * Same as above, but extra features are added showing the amount
-                  of time between each ``time_on``
+                  of time between each `time_on`
         batch_data: pd.DataFrame, optional (default=None)
-            If 'None', uses the default ``self.batch_data``. Otherwise, a custom
-            ``batch_data`` may be passed, for example if only batches of a
+            If 'None', uses the default `self.batch_data`. Otherwise, a custom
+            `batch_data` may be passed, for example if only batches of a
             certain duration wish to be included
         lo: integer, default=1
-            For ``method='basic'``, only batches with a minimum of ``lo`` alarms
-            will be included in the returned feature set. For ``method='t_on'``
-            or ``'time'``, it's the minimum number of ``time_on``\s.
+            For `method='basic'`, only batches with a minimum of `lo` alarms
+            will be included in the returned feature set. For `method='t_on'`
+            or `'time'`, it's the minimum number of `time_on`\s.
         hi: integer, default=10
-            For ``method='basic'``, only batches with a maximum of ``hi`` alarms
-            will be included in the returned feature set. For ``method='t_on'``
-            or ``'time'``, it's the maximum number of ``time_on``\s.
+            For `method='basic'`, only batches with a maximum of `hi` alarms
+            will be included in the returned feature set. For `method='t_on'`
+            or `'time'`, it's the maximum number of `time_on`\s.
         num: integer, float, default=1
             The number to be placed in the feature vector to indicate the
             presence of a particular alarm
         event_type: string, default='fault_events'
             The members of batch_data to include for building the feature set.
-            Should normally be ``'fault_events'`` or ``'all_events'``
+            Should normally be `'fault_events'` or `'all_events'`
         groups: boolean, default=True
             Whether to include the grouped or un-grouped fault/event data
 
@@ -406,13 +398,13 @@ class Batches:
         -------
         feature_array: numpy.ndarray
             An array of feature arrays corresponding to each batch that has met
-            the ``hi`` and ``lo`` criteria
+            the `hi` and `lo` criteria
         assoc_batch: unmpy.ndarray
             An array of 2-length index arrays. It is the same length as
-            ``feature_array``, and each entry points to the corresponding
-            ``feature_array``'s index in ``batch_data``, which in turn contains
-            the index of the ``feature_array``'s associated events in the
-            original ``events_data`` or ``fault_data``.
+            `feature_array`, and each entry points to the corresponding
+            `feature_array`'s index in `batch_data`, which in turn contains
+            the index of the `feature_array`'s associated events in the
+            original `events_data` or `fault_data`.
         """
 
         if (self.code_groups) and (groups is True):

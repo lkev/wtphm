@@ -1,8 +1,6 @@
-import numpy as np
 # from sklearn.base import TransformerMixin
 # from .batch_clustering import investigate_label
 import pandas as pd
-from scipy.ndimage.interpolation import shift
 
 
 def label_stoppages(
@@ -11,9 +9,9 @@ def label_stoppages(
     """Label times in the scada data which occurred during a stoppage and
     leading up to a stoppage as such.
 
-    This adds a column to the passed ``scada_data``, ``stoppage``, and an
-    optional column ``pre_stop``. ``stoppage`` is given a 1 if the scada point
-    in question occurs during a stoppage, and ``pre_stop`` is given a 1 in the
+    This adds a column to the passed `scada_data`, `stoppage`, and an
+    optional column `pre_stop`. `stoppage` is given a 1 if the scada point
+    in question occurs during a stoppage, and `pre_stop` is given a 1 in the
     samples leading up to the stoppage. Both are 0 otherwise. These vary under
     different circumstances (see below).
 
@@ -28,25 +26,25 @@ def label_stoppages(
         Whether to drop the actual entries which correspond to the batches, i.e.
         not the pre-fault data, but the fault data itself. This is highly
         recommended, as otherwise the stoppages themselves will be kept in the
-        returned data, though the ``stoppage`` label for these entries will be
+        returned data, though the `stoppage` label for these entries will be
         labelled as "1", while the fault-free data will be labelled "0".
     label_pre_stop: bool; default=True
-        If True, add a column to the returned ``scada_data_l`` for ``pre_stop``.
+        If True, add a column to the returned `scada_data_l` for `pre_stop`.
         Samples in the time leading up to a stoppage are given label 1, and 0
         otherwise.
     pre_stop_lims: 2*1 list of pd.Timedelta strs, default=['90 mins', 0]
-        The amount of time before a stoppage to label scada as ``pre_stop``.
-        E.g., by default, ``pre_stop`` is labelled as 1 in the time between 90
+        The amount of time before a stoppage to label scada as `pre_stop`.
+        E.g., by default, `pre_stop` is labelled as 1 in the time between 90
         mins and 0 mins before the stoppage occurs. If ['120 mins', '20 mins']
         is passed, scada samples from 120 minutes before until 20 minutes before
-        the stoppage are given the ``pre_stop`` label 1.
+        the stoppage are given the `pre_stop` label 1.
     batches_to_drop: pd.DataFrame, optional; default=None
         Additional batches which should be dropped from the scada data. If this
-        is passed, ``drop_type`` must be given a string as well.
+        is passed, `drop_type` must be given a string as well.
     drop_type: str, optional; default=None
-        Only used when ``batches_to_drop`` has been passed.
+        Only used when `batches_to_drop` has been passed.
         If 'both', the stoppage and pre-stop entries (according to
-        pre_stop_lims) corresponding to batches in ``batches_to_drop`` are
+        pre_stop_lims) corresponding to batches in `batches_to_drop` are
         dropped from the scada data.
         If 'stop', only the stoppage entries are dropped
         If 'pre', opnly the pre-stop entries are dropped
@@ -54,8 +52,8 @@ def label_stoppages(
     Returns
     -------
     scada_data_l: pd.DataFrame
-        The original scada_data dataframe with the ``pre_stop``, ``stoppage``
-        and ``batch_id`` columns added
+        The original scada_data dataframe with the `pre_stop`, `stoppage`
+        and `batch_id` columns added
     """
 
     if (batches_to_drop is not None) and (drop_type is None):
@@ -164,53 +162,6 @@ def _get_pre_stop_ids(fault_batches, scada_data_l, pre_stop_lims):
         pre_stop_ids = pre_stop_ids.append(cur_pre_stop_ids)
         pre_stop_batch_ids[b.Index] = cur_pre_stop_batch_ids
     return pre_stop_ids, pre_stop_batch_ids
-
-
-def get_lagged_features(X, y, features_to_lag_inds, steps):
-    """Returns an array with certain columns as lagged features
-
-    Args
-    ----
-    X: m*n np.ndarray
-        The input features, with m samples and n features
-    y: m*1 np.ndarray
-        The m target values
-    features_to_lag_inds: np.array
-        The indices of the columns in `X` which will be lagged
-    steps: int
-        The number of lagging steps. This means for feature 'B' at time T,
-        features will be added to X at T for B@(T-1), B@(T-2)...B@(T-steps).
-
-    Returns
-    -------
-    X_lagged: np.ndarray
-        An array with the original features and lagged features appended. The
-        number of samples will necessarily be decreased because there will be
-        some samples at the start with NA values for features.
-    y_lagged: np.ndarray
-        An updated array of target vaues corresponding to the new number of
-        samples in ``X_lagged``
-
-    """
-    # get a slice with columns of features to be lagged
-    X_f = X[:, features_to_lag_inds]
-
-    m = X_f.shape[0]
-    n = X_f.shape[1]
-    n_ = n * steps
-
-    X_lagged = np.zeros((m, n_))
-
-    for i in np.arange(0, steps):
-        X_lagged[:, i * n:(i * n) + n] = shift(X_f, [i + 1, 0], cval=np.NaN)
-
-    X_lagged = np.concatenate((X_f, X_lagged), axis=1)
-
-    y_lagged = y[~np.isnan(X_lagged).any(axis=1)]
-    X_lagged = X_lagged[~np.isnan(X_lagged).any(axis=1)]
-
-    return X_lagged, y_lagged
-
 
 
 # def label_scada_data(
@@ -462,4 +413,3 @@ def get_lagged_features(X, y, features_to_lag_inds, steps):
 #     def transform(self, X):
 #         if type(X) is pd.DataFrame:
 #             return X[self.feature_list]
-

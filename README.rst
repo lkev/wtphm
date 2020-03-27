@@ -44,22 +44,8 @@ Usage Example
 
 Documentation
 =============
-For a local copy of the docs, see docs/_build/index.html. Documentation can also
-be found at ...
-
-Documentation can be built locally from the docs folder using Sphinx, and will soon be available on readthedocs.io. Alternatively, the docstrings of all classes and functions give comprehensive information on their use.
-
-Change Notes
-============
-``event_batches.py`` is deprecated, new functionality is in ``batch.py``
-
-the ``get_batch_features`` function in ``batch_clustering.py`` can be accessed through ``batch.py``
-
-The ``sil_1_cluster`` and ``sil_n_clusters`` must be accessed through ``batch_clustering.py``
-
-``scada_labelling.py`` is now what is used to label the batches instead of ``event_prediction.py``. ``event_prediction.py`` is currently still included for legacy purposes.
-
-``event_probs.py`` is used to calculate probabilities that certain events will trigger each other
+Documentation can be found `here <https://wtphm.readthedocs.io/en/latest/>`_. For
+a local copy of the docs, see docs/_build/index.html.
 
 
 References
@@ -67,7 +53,9 @@ References
 [1] Leahy, Kevin, et al. "A robust prescriptive framework and performance metric
 for diagnosing and predicting wind turbine faults based on SCADA and alarms data
 with case study." Energies 11.7 (2018): 1738.
+
 [2] Leahy, Kevin, et al. "Issues with data quality for wind turbine condition
 monitoring and reliability analyses." Energies 12.2 (2019): 201.
+
 [3] Leahy, Kevin, et al. "Cluster analysis of wind turbine alarms for
 characterising and classifying stoppages." IET Renewable Power Generation 12.10 (2018): 1146-1154.

@@ -29,9 +29,6 @@ attributes:
 * event code
 * description
 
-More Information
-================
-
 More information on the batches and the process behind creating them can be
 found in [1].
 

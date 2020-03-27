@@ -50,6 +50,8 @@ Documentation
 For a local copy of the docs, see docs/_build/index.html. Documentation can also
 be found at ...
 
+Documentation can be built locally from the docs folder using Sphinx, and will soon be available on readthedocs.io. Alternatively, the docstrings of all classes and functions give comprehensive information on their use.
+
 Change Notes
 ============
 ``event_batches.py`` is deprecated, new functionality is in ``batch.py``

@@ -1,0 +1,7 @@
+pandas
+numpy
+sklearn
+matplotlib
+wtphm
+warnings
+operator

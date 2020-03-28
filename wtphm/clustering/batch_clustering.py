@@ -6,6 +6,7 @@ It contains functions for extracting clustering-related features from the
 batches, as well as functions for silhouette plots for evauating them.
 
 This code was used in the following paper:
+
 Leahy, Kevin, et al. "Cluster analysis of wind turbine alarms for
 characterising and classifying stoppages." IET Renewable Power Generation
 12.10 (2018): 1146-1154.
@@ -27,15 +28,15 @@ import warnings
 def get_batch_features(event_data, fault_codes, batch_data, method, lo=1,
                        hi=10, num=1, event_type='fault_events'):
     """Extract features from batches of events which appear during
-    stoppages.
+    stoppages, to be used for clustering.
 
     Only features from batches that comply with certain constraints are
     included. These constraints are chosen depending on which feature
     extraction method is used. Details of the feature extraction methods can
     be found in [1].
 
-    **Note:** For each "batch" of alarms, there are up to `num_codes` unique
-    alarm codes. Each alarm has an associated start time, `time_on`.
+    **Note:** For each "batch" of alarms, there are up to ``num_codes`` unique
+    alarm codes. Each alarm has an associated start time, ``time_on``.
 
     Args
     ----
@@ -44,40 +45,41 @@ def get_batch_features(event_data, fault_codes, batch_data, method, lo=1,
     fault_codes: numpy.ndarray
         All event codes that will be treated as fault events for the batches
     batch_data: pandas.DataFrame
-        The dataframe holding the indices in `event_data` and start and end
+        The dataframe holding the indices in ``event_data`` and start and end
         times for each batch
     method: string
         One of 'basic', 't_on', 'time'.
+
         basic:
-            * Only considers batches with between `lo` and `hi` individual
+            * Only considers batches with between ``lo`` and ``hi`` individual
               alarms.
-            * Array of zeros is filled with `num` corresponding to order of
+            * Array of zeros is filled with ``num`` corresponding to order of
               alarms' appearance.
             * Does not take into account whether alarms occurred
               simultaneously.
-            * Resultant vector of length `num_codes * hi`
+            * Resultant vector of length ``num_codes * hi``
         t_on:
-            * Only consider batches with between `lo` and `hi` individual
-              `time_on`s.
-            * For each `time_on` in each batch, an array of zeros is filled
+            * Only consider batches with between ``lo`` and ``hi`` individual
+              ``time_on``\s.
+            * For each ``time_on`` in each batch, an array of zeros is filled
               with ones in places corresponding to an alarm that has fired
               at that time.
-            * Results in a pattern array of length `num_codes * hi`
+            * Results in a pattern array of length ``num_codes * hi``
               which shows the sequential order of the alarms which have been
               fired.
         time:
             * Same as above, but extra features are added showing the amount
-              of time between each `time_on`
+              of time between each ``time_on``
     lo: integer, default=1
-        For `method='basic'`, only batches with a minimum of `lo` alarms
+        For ``method='basic'``, only batches with a minimum of ``lo`` alarms
         will be included in the returned feature set.
-        for `method='t_on'` or `method='time'`, it's the minimum number of
-        `time_on`s.
+        for ``method='t_on'`` or ``method='time'``, it's the minimum number of
+        ``time_on``\s.
     hi: integer, default=10
-        For `method='basic'`, only batches with a maximum of `hi` alarms
+        For ``method='basic'``, only batches with a maximum of ``hi`` alarms
         will be included in the returned feature set.
-        for `method='t_on'` or `method='time'`, it's the maximum number of
-        `time_on`s.
+        for ``method='t_on'`` or ``method='time'``, it's the maximum number of
+        ``time_on``\s.
     num: integer, float, default=1
         The number to be placed in the feature vector to indicate the
         presence of a particular alarm
@@ -89,21 +91,19 @@ def get_batch_features(event_data, fault_codes, batch_data, method, lo=1,
     -------
     feature_array: numpy.ndarray
         An array of feature arrays corresponding to each batch that has has
-        met the `hi` and `lo` criteria
+        met the ``hi`` and ``lo`` criteria
     assoc_batch: unmpy.ndarray
         An array of 2-length index arrays. It is the same length as
-        `feature_array`, and each entry points to the corresponding
-        `feature_array`'s index in `batch_data`, which in turn contains the
-        index of the `feature_array`'s associated events in the original
-        `events_data` or `fault_data`.
+        ``feature_array``, and each entry points to the corresponding
+        ``feature_array``'s index in ``batch_data``, which in turn contains the
+        index of the ``feature_array``'s associated events in the original
+        ``events_data`` or ``fault_data``.
 
     References
     ----------
     [1] Leahy, Kevin, et al. "Cluster analysis of wind turbine alarms for
     characterising and classifying stoppages." IET Renewable Power Generation
     12.10 (2018): 1146-1154.
-
-
     """
 
     if event_type == 'fault_events':
@@ -192,7 +192,8 @@ def _batch_features_t_on(batch_data, event_type, event_data, num_codes,
             for t_on in unique_t_ons:
                 t_on_alarm_pattern = np.array(0).repeat(num_codes)
                 for code in batch_events[
-                        batch_events.time_on == pd.Timestamp(t_on)].code.values:
+                        batch_events.time_on == pd.Timestamp(t_on)].code\
+                        .values:
                     t_on_alarm_pattern[code_idx[code]] = num
                 batch_features[k:k + num_codes] = t_on_alarm_pattern
                 k += num_codes
@@ -239,7 +240,8 @@ def _batch_features_t_on_time(batch_data, event_type, event_data, num_codes,
                 t_on_alarm_pattern = np.array(0).repeat(num_codes)
 
                 for code in batch_events[
-                        batch_events.time_on == pd.Timestamp(t_on)].code.values:
+                        batch_events.time_on == pd.Timestamp(t_on)].code\
+                        .values:
                     t_on_alarm_pattern[code_idx[code]] = num
 
                 batch_features[k:k + num_codes] = t_on_alarm_pattern
@@ -261,13 +263,13 @@ def sil_1_cluster(
         X, cluster_labels, axis_label=True, save=False, save_name=None,
         x_label="Silhouette coefficient values", avg_pos=.02,
         w=2.3, h=2.4):
-    """Show the silhouette scores for `clusterer`, print the plot, and
+    """Show the silhouette scores for ``clusterer``, print the plot, and
     optionally save it
 
     Args
     ----
     X : np.array or list-like
-        Features (possibly `feature_array` - need to check!)
+        Features (possibly ``feature_array`` - need to check!)
     cluster_labels : list of strings
         the labels of each cluster
     axis_label : Boolean, default=True
@@ -365,7 +367,7 @@ def sil_n_clusters(X, range_n_clusters, clust):
     Args
     ----
     X : np.array or list-like
-        Features (possibly `feature_array` - need to check!)
+        Features (possibly ``feature_array`` - need to check!)
     range_n_clusters : list-like
         The range of clusters you want, e.g. [2,3,4,5,10,20]
     clust : sklearn clusterer
@@ -375,7 +377,7 @@ def sil_n_clusters(X, range_n_clusters, clust):
     -------
     cluster_labels: numpy.ndarray
         The labels for the clusters, with each one corresponding to a feature
-        vector in `X`.
+        vector in ``X``.
     Also prints the silhouette analysis
 
     """
@@ -414,7 +416,8 @@ def sil_n_clusters(X, range_n_clusters, clust):
         silhouette_avg = metrics.silhouette_score(X, cluster_labels)
 
         # Compute the silhouette scores for each sample
-        sample_silhouette_values = metrics.silhouette_samples(X, cluster_labels)
+        sample_silhouette_values = metrics.silhouette_samples(
+            X, cluster_labels)
 
         y_lower = 10
         for i in range(n_clusters):
@@ -464,19 +467,19 @@ def cluster_times(batch_data, cluster_labels, assoc_batch,
     Args
     ----
     batch_data: pandas.DataFrame
-        The dataframe holding the indices in `event_data` and start and end
+        The dataframe holding the indices in ``event_data`` and start and end
         times for each batch
     cluster_labels:  numpy.ndarray
         The labels for the clusters, with each one corresponding to a feature
-        vector in `assoc_batch`
+        vector in ``assoc_batch``
     assoc_batch: nunmpy.ndarray
-        Indices of batches associated with each `feature_array`. Obtained
-        from :func:`.get_batch_features`
+        Indices of batches associated with each ``feature_array``. Obtained
+        from :func:``.get_batch_features``
     event_dur_type: string
         The event group duration in batch_data to return, i.e. either
         'fault_dur' or 'down_dur'. 'down_dur' means the entire time the turbine
         was offline, 'fault_dur' just means while the turbine was faulting. See
-        :func:`wtphm.batch.Batches.get_batch_data` for details
+        :func:``wtphm.batch.Batches.get_batch_data`` for details
 
     Returns
     -------

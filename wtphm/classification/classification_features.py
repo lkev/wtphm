@@ -13,7 +13,7 @@ def get_lagged_features(X, y, features_to_lag_inds, steps):
     y: m*1 np.ndarray
         The m target values
     features_to_lag_inds: np.array
-        The indices of the columns in `X` which will be lagged
+        The indices of the columns in ``X`` which will be lagged
     steps: int
         The number of lagging steps. This means for feature 'B' at time T,
         features will be added to X at T for B@(T-1), B@(T-2)...B@(T-steps).
@@ -26,7 +26,7 @@ def get_lagged_features(X, y, features_to_lag_inds, steps):
         some samples at the start with NA values for features.
     y_lagged: np.ndarray
         An updated array of target vaues corresponding to the new number of
-        samples in `X_lagged`
+        samples in ``X_lagged``
 
     """
     # get a slice with columns of features to be lagged

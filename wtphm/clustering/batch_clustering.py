@@ -41,7 +41,8 @@ def get_batch_features(event_data, fault_codes, batch_data, method, lo=1,
     Args
     ----
     event_data: pandas.DataFrame
-        The original events/fault data
+        The original events/fault data. May be grouped (see
+        :func:wtphm.batch_clustering.get_grouped_events_data`).
     fault_codes: numpy.ndarray
         All event codes that will be treated as fault events for the batches
     batch_data: pandas.DataFrame

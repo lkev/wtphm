@@ -21,8 +21,8 @@ def label_stoppages(
     scada_data: pandas.DataFrame
         Full set of SCADA data for the turbine.
     fault_batches: pandas.DataFrame
-        The dataframe holding the indices in event_data and start and end times
-        for each batch (each batch related to a stoppage).
+        The dataframe of batches of fault events, a subset of the output of
+        :func:wtphm.batch.get_batch_data`
     drop_fault_batches: bool, default=True
         Whether to drop the actual entries which correspond to the batches,
         i.e. not the pre-fault data, but the fault data itself. This is highly
@@ -33,7 +33,8 @@ def label_stoppages(
         If True, add a column to the returned ``scada_data_l`` for
         ``pre_stop``. Samples in the time leading up to a stoppage are given
         label 1, and 0 otherwise.
-    pre_stop_lims: 2*1 list of pd.Timedelta strs, default=['90 mins', 0]
+    pre_stop_lims: 2*1 list of ``pd.Timedelta``-compatible strings,\
+        default=['90 mins', 0]
         The amount of time before a stoppage to label scada as ``pre_stop``.
         E.g., by default, ``pre_stop`` is labelled as 1 in the time between 90
         mins and 0 mins before the stoppage occurs. If ['120 mins', '20 mins']

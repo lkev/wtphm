@@ -1,45 +1,7 @@
 import pandas as pd
 import numpy as np
 from itertools import chain
-# import warnings
 
-
-# todo:
-#   * take out grouped bits - have them as a separate function
-#   * What to do about the batch stop cats, and repair cat
-#   * whether the above needs to be included in the documentation as a requirement
-#       in the scada data.
-#   * update all the docstrings of everything that mentions batch_data and
-#       events_data, to include reference to whether it's grouped or not
-#   * try out the scada_labelling and get_batch_features parts - include them
-#       in the repository
-#   * make a note that the clustering stuff is only there for legacy purposes,
-#       to demonstrate what was carried out in paper 2
-#   * clean scada data in notebook to be anaonymous as well
-
-
-    # code_groups : list-like, optional, default=None
-    #     Some events with similar codes/descriptions, e.g. identical pitch
-    #     faults that happen along different turbine axes, may be given the same
-    #     code and description so they are treated as the same event code during
-    #     analysis.
-    #     Must be in the form: '[[10, 11, 12], [24, 25], [56, 57, 58]]' or
-    #     '[10, 11, 12]'. If this is passed, then the attributes
-    #     ``grouped_fault_codes`` and ``grouped_event_data`` become available.
-
-    # groups: bool, default=True
-    #     Whether or not the returned dataframe will group together similar
-    #     fault codes, as per ``grouped_fault_codes``.
-
-        # # if groups=False, then the only thing this means is that the
-        # # codes in fault_start_codes and all_start_codes are grouped, but the
-        # # ids remain unchanged
-        # if (code_groups) and (groups is True):
-        #     event_data = grouped_event_data
-        #     fault_data = grouped_fault_data
-        # else:
-        #     event_data = event_data
-        #     fault_data = fault_data
 
 def get_grouped_event_data(event_data, code_groups, fault_codes):
     """

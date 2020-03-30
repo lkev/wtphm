@@ -7,4 +7,3 @@
 from wtphm import classification
 from wtphm import clustering
 from wtphm import batch
-from wtphm import oldbatch

@@ -49,9 +49,9 @@ signifies return to normal operation after any downtime or abnormal operating
 period.
 
 
-Usage Example
+User Guide and Usage Examples
 =============
-*To be included soon!*
+See the examples/wtphm_readme_examples.ipynb notebook!.
 
 Documentation
 =============

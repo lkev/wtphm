@@ -1,14 +1,12 @@
 import sys
-import os
 import pandas as pd
-import numpy as np
 import importlib as imp
 
 imp_path = 'C:/users/leahy/Google Drive/UCC/PhD/Code/modules/'\
     'wtphm/'
 sys.path.insert(0, imp_path)
 
-import wtphm
+import wtphm # noqa
 imp.reload(wtphm)
 events = pd.read_csv(
     imp_path + 'examples/events_data.csv',
@@ -39,7 +37,8 @@ batches = wtphm.batch.get_batch_data(
     event_data=grouped_events, fault_codes=grouped_stop_codes, ok_code=207,
     t_sep_lim='1 hours')
 
-# label the dats
-batches = wtphm.batch.label_batch_stop_cats(batches, events, scada)
+# get the cats
+batches = wtphm.batch.get_batch_stop_cats(
+    batches, events, scada, 'lot', 'mt', 'rt')
 
 batches.head()

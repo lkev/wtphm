@@ -9,10 +9,22 @@ wtphm package
 
 .. toctree::
 
-   wtphm.classification
    wtphm.clustering
 
 
-.. toctree::
+wtphm.batch
+-----------
 
-   wtphm.batch
+.. automodule:: wtphm.batch
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+wtphm.classification
+--------------------
+
+.. automodule:: wtphm.classification
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

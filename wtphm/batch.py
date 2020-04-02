@@ -1,45 +1,8 @@
 import pandas as pd
 import numpy as np
 from itertools import chain
-# import warnings
+from collections import Counter
 
-
-# todo:
-#   * take out grouped bits - have them as a separate function
-#   * What to do about the batch stop cats, and repair cat
-#   * whether the above needs to be included in the documentation as a requirement
-#       in the scada data.
-#   * update all the docstrings of everything that mentions batch_data and
-#       events_data, to include reference to whether it's grouped or not
-#   * try out the scada_labelling and get_batch_features parts - include them
-#       in the repository
-#   * make a note that the clustering stuff is only there for legacy purposes,
-#       to demonstrate what was carried out in paper 2
-#   * clean scada data in notebook to be anaonymous as well
-
-
-    # code_groups : list-like, optional, default=None
-    #     Some events with similar codes/descriptions, e.g. identical pitch
-    #     faults that happen along different turbine axes, may be given the same
-    #     code and description so they are treated as the same event code during
-    #     analysis.
-    #     Must be in the form: '[[10, 11, 12], [24, 25], [56, 57, 58]]' or
-    #     '[10, 11, 12]'. If this is passed, then the attributes
-    #     ``grouped_fault_codes`` and ``grouped_event_data`` become available.
-
-    # groups: bool, default=True
-    #     Whether or not the returned dataframe will group together similar
-    #     fault codes, as per ``grouped_fault_codes``.
-
-        # # if groups=False, then the only thing this means is that the
-        # # codes in fault_start_codes and all_start_codes are grouped, but the
-        # # ids remain unchanged
-        # if (code_groups) and (groups is True):
-        #     event_data = grouped_event_data
-        #     fault_data = grouped_fault_data
-        # else:
-        #     event_data = event_data
-        #     fault_data = fault_data
 
 def get_grouped_event_data(event_data, code_groups, fault_codes):
     """
@@ -197,7 +160,7 @@ def get_batch_data(event_data, fault_codes, ok_code, t_sep_lim='12 hour'):
         DataFrame with the following headings:
 
         * ``turbine_num``: turbine number of the batch
-        * ``fault_start_codes``: the fault codes present at the first
+        * ``root_codes``: the fault codes present at the first
           timestamp in the batch
         * ``all_start_codes``: all event start codes present at the first
           timestamp in the batch
@@ -309,7 +272,7 @@ def _get_batch_df(batch_ids, event_data, fault_data):
             fault_end_time = rel_events.time_on.max()
             down_end_time = all_events.time_on.max()
 
-            fault_start_codes = tuple(sorted(rel_events.loc[
+            root_codes = tuple(sorted(rel_events.loc[
                 rel_events.time_on == start_time, 'code'].unique()))
             all_start_codes = tuple(sorted(all_events.loc[
                 all_events.time_on == start_time, 'code'].unique()))
@@ -318,12 +281,12 @@ def _get_batch_df(batch_ids, event_data, fault_data):
             down_dur = down_end_time - start_time
 
             data.append(
-                [t, fault_start_codes, all_start_codes, start_time,
+                [t, root_codes, all_start_codes, start_time,
                  fault_end_time, down_end_time, fault_dur, down_dur,
                  fault_event_ids, all_event_ids])
 
     columns = [
-        'turbine_num', 'fault_start_codes', 'all_start_codes',
+        'turbine_num', 'root_codes', 'all_start_codes',
         'start_time', 'fault_end_time', 'down_end_time', 'fault_dur',
         'down_dur', 'fault_event_ids', 'all_event_ids']
 
@@ -331,3 +294,159 @@ def _get_batch_df(batch_ids, event_data, fault_data):
         data, columns=columns).dropna().reset_index(drop=True)
 
     return batch_data
+
+
+def label_batch_stop_cats(batches, events_data, scada_data):
+    """
+    Labels the batches with an assumed stop category, based on the stop
+    categories of the root event(s) which triggered them, i.e. the one or more
+    events occurring simultaneously which caused the turbine to stop (items
+    lower down supersede those higher up):
+
+    * If **all** root events in the batch are "normal" events, then the
+    batch is labelled normal
+    * Otherwise, label as the most common stop cat in the initial events
+    * If a single sensor category event is present, label sensor
+    * If a single grid category event is present, label grid. Also label grid
+    if the grid counter was active in the scada data. This is a timer
+    indicating how long the turbine was down due to grid issues, used for
+    calculating contract availability
+    * If the maintenance counter was active in the scada data, label maint
+    * There is an additional column labelled "repair". If the repair counter
+    was active, the turbine was brought down for repairs, and this is given the
+    value "TRUE" for these times.
+
+    Args
+    ----
+
+    batches: pd.Dataframe
+        The batch data
+    events_data: pd.Dataframe
+        The events data
+    scada_data: pd.Dataframe
+        The scada data
+
+    Returns
+    -------
+    batches_sc: pd.Dataframe
+        The batches data with stop categories and repair status added
+    """
+    root_cats = _get_root_cats(batches, events_data)
+    cat_counts = _get_cat_counts(root_cats)
+
+    most_common_cats = _get_most_common_cats(cat_counts)
+    grid_ids = _get_cat_present_ids(root_cats, 'grid')
+    grid_counter_ids = _counter_value_ids(batches, scada_data, 'lot',
+                                          counter_value=0)
+    grid_ids = grid_ids.append(grid_counter_ids).drop_duplicates()
+    sensor_ids = _get_cat_present_ids(root_cats, 'sensor')
+    maint_ids =_counter_value_ids(batches, scada_data, 'mt')
+    all_normal_ids = _get_cat_all_ids(root_cats, 'ok')
+    repair_ids = _counter_value_ids(
+        batches, scada_data, 'rt', counter_value=0)
+
+    batches['batch_cat'] = most_common_cats
+    batches.loc[all_normal_ids, 'batch_cat'] = 'ok'
+    batches.loc[sensor_ids, 'batch_cat'] = 'sensor'
+    batches.loc[grid_ids, 'batch_cat'] = 'grid'
+    batches.loc[maint_ids, 'batch_cat'] = 'maintenance'
+
+    batches['repair'] = False
+    batches.loc[repair_ids, 'repair'] = True
+
+
+
+    return batches
+
+
+def _get_root_cats(batches, events_data):
+    """
+    Gets the ``stop_cat`` for the fault start codes of a batch
+    """
+    def gr_cur(cur_root, events_data):
+        r_cats = tuple()
+        for rc in cur_root:
+            cat = events_data.loc[events_data.code == rc, 'stop_cat']\
+                .unique()[0]
+            r_cats += tuple([cat])
+        return r_cats
+
+    return batches.root_codes.apply(
+        gr_cur, **{'events_data': events_data})
+
+
+def _get_cat_counts(root_cats):
+    """
+    applies a counter to return a series of dictionaries of counts of
+    ``root_cats``.
+
+    Each dictionary contains a count of the different categories in the
+    ``root_cats``
+    """
+    cat_counts = root_cats.apply(
+        lambda x: Counter(fault for fault in x))
+    return cat_counts
+
+
+def _get_most_common_cats(cat_counts):
+    """
+    Gets the most common fault cat from a dictionary of fault cat counts.
+    """
+    def gmc_cur(cur_cat):
+        cur_val = -1
+        cur_f = ''
+        for k, v in cur_cat.items():
+            if v == cur_val:
+                cur_f += f', {k}'
+            if v > cur_val:
+                cur_f = k
+            cur_val = v
+        return cur_f
+    return cat_counts.apply(gmc_cur)
+
+
+def _get_cat_all_ids(root_cats, cat):
+    """
+    Returns the ids in ``root_cats`` where all entries in ``root_cats``
+    are ``cat``.
+    """
+    cat_ids = []
+    for i, c in root_cats.iteritems():
+        if set(c) == set([cat]):
+            cat_ids.append(i)
+    return pd.Index(cat_ids)
+
+
+def _get_cat_present_ids(root_cats, cat):
+    """
+    Returns the ids in ``root_cats`` where ``cat`` is present.
+    """
+    cat_ids = []
+    for i, c in root_cats.iteritems():
+        if cat in c:
+            cat_ids.append(i)
+    return pd.Index(cat_ids)
+
+
+def _counter_value_ids(batches, scada_data, counter_col, counter_value=0):
+    """
+    Mark batches during which certain scada counters were active
+
+    In 10-minute SCADA data there are often counters for when the turbine was
+    in various different states, for calculating contractual availability.
+    This function finds the named ``counter_col`` in ``scada_data``, and
+    identifies any sample periods where this value was above ``counter_value``.
+
+    If any of these sample periods fall within a certain batch, then this
+    function returns those batch ids.
+    """
+    batch_ids = []
+    for b in batches.itertuples():
+        start = b.start_time
+        end = (b.down_end_time + pd.Timedelta('5 minutes')).round('10T')
+        batch_scada = scada_data[
+            (scada_data.turbine_num == b.turbine_num) &
+            (scada_data.time >= start) & (scada_data.time <= end)]
+        if batch_scada[counter_col].sum() > counter_value:
+            batch_ids.append(b.Index)
+    return pd.Index(batch_ids)

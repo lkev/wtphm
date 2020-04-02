@@ -1,10 +1,7 @@
 import pandas as pd
 import numpy as np
 from itertools import chain
-<<<<<<< HEAD
 from collections import Counter
-=======
->>>>>>> master
 
 
 def get_grouped_event_data(event_data, code_groups, fault_codes):

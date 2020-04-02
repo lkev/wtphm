@@ -5,12 +5,11 @@ import numpy as np
 import importlib as imp
 
 imp_path = 'C:/users/leahy/Google Drive/UCC/PhD/Code/modules/'\
-    'wtphm_auto_batch_labelling/'
+    'wtphm/'
 sys.path.insert(0, imp_path)
 
 import wtphm
 imp.reload(wtphm)
-bfc = pd.read_csv(imp_path + 'examples/batch_fault_cats.csv')
 events = pd.read_csv(
     imp_path + 'examples/events_data.csv',
     parse_dates=['time_on', 'time_off'])

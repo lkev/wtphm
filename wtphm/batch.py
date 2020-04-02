@@ -354,8 +354,6 @@ def label_batch_stop_cats(batches, events_data, scada_data):
     batches['repair'] = False
     batches.loc[repair_ids, 'repair'] = True
 
-
-
     return batches
 
 

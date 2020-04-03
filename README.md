@@ -56,6 +56,7 @@ occurred, or status messages like low- or no- wind, or turbine shutting down due
 to storm winds.
 
 The data must have the following column headers and data:
+
 * ``turbine_num``: The turbine the data applies to
 * ``code``: There are a set list of events which can occur on the
   turbine. Each one of these has an event code
@@ -83,7 +84,7 @@ For the purposes of this library, it must have the following column headers and
 data:
 
 * ``turbine_num``: The turbine the data applies to
-* ``time```: The 10-minute period the data belongs to
+* ``time``: The 10-minute period the data belongs to
 * availability counters: Some of the functions for giving the batches a stop
   category rely on availability counters. These are sometimes stored as part of
   scada data, and sometimes in separate availability data. They count the portion
@@ -102,7 +103,7 @@ See the examples/wtphm_readme_examples.ipynb notebook!.
 Documentation
 =============
 Documentation can be found `here <https://wtphm.readthedocs.io/en/latest/>`_. For
-a local copy of the docs, see docs/_build/index.html.
+a local copy of the docs, see `docs/_build/index.html`_.
 
 
 References

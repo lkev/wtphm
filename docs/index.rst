@@ -10,7 +10,7 @@
    wtphm
 
 
-.. include:: ../README.rst
+.. include:: ../README
 
 
 Github Page

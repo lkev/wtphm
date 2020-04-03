@@ -34,7 +34,12 @@ extensions = [
               'sphinx.ext.autodoc',
               'sphinx.ext.napoleon',
               'sphinx_rtd_theme'
-]
+              ]
+
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.md': 'markdown',
+}
 
 # letting readthedocs know that the master_file is not called contents, it's
 # called index

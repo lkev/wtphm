@@ -160,9 +160,9 @@ def get_batch_data(event_data, fault_codes, ok_code, t_sep_lim='12 hour'):
         DataFrame with the following headings:
 
         * ``turbine_num``: turbine number of the batch
-        * ``root_codes``: the fault codes present at the first
+        * ``fault_root_codes``: the fault codes present at the first
           timestamp in the batch
-        * ``all_start_codes``: all event start codes present at the first
+        * ``all_root_codes``: all event start codes present at the first
           timestamp in the batch
         * ``start_time``: start of first event in the batch
         * ``fault_end_time``: ``time_on`` of the last fault event in the
@@ -272,21 +272,21 @@ def _get_batch_df(batch_ids, event_data, fault_data):
             fault_end_time = rel_events.time_on.max()
             down_end_time = all_events.time_on.max()
 
-            root_codes = tuple(sorted(rel_events.loc[
+            fault_root_codes = tuple(sorted(rel_events.loc[
                 rel_events.time_on == start_time, 'code'].unique()))
-            all_start_codes = tuple(sorted(all_events.loc[
+            all_root_codes = tuple(sorted(all_events.loc[
                 all_events.time_on == start_time, 'code'].unique()))
 
             fault_dur = fault_end_time - start_time
             down_dur = down_end_time - start_time
 
             data.append(
-                [t, root_codes, all_start_codes, start_time,
+                [t, fault_root_codes, all_root_codes, start_time,
                  fault_end_time, down_end_time, fault_dur, down_dur,
                  fault_event_ids, all_event_ids])
 
     columns = [
-        'turbine_num', 'root_codes', 'all_start_codes',
+        'turbine_num', 'fault_root_codes', 'all_root_codes',
         'start_time', 'fault_end_time', 'down_end_time', 'fault_dur',
         'down_dur', 'fault_event_ids', 'all_event_ids']
 
@@ -385,7 +385,7 @@ def get_root_cats(batch_data, events_data):
             r_cats += tuple([cat])
         return r_cats
 
-    return batch_data.root_codes.apply(
+    return batch_data.fault_root_codes.apply(
         gr_cur, **{'events_data': events_data})
 
 

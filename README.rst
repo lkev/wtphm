@@ -5,10 +5,13 @@ The **W**\ind **T**\urbine **P**\rognostics and **H**\ealth **M**\anagement libr
 processes wind turbine events (also called alarms or status) data, as well as
 operational SCADA data (the usually 10-minute data coming off of wind turbines).
 
-The main aim of the package is to process raw turbine alarm data to identify
-periods of downtime, or different modes of operation (e.g. gird-related curtailment),
-and relate these back to the SCADA data. This data can then be used for reliability
-analyses or testing predictive maintenance algorithms.
+Turbine alarms often appear in high numbers during fault events, and significant
+effort can be involved in processing these alarms in order to find what actually
+happened.
+This module solves this by grouping similar alarm sequences together into "batches"
+of alarms, assigning a high-level "stoppage category" to each batch, and providing
+functionality to overlay this onto operational scada data for labelling for
+training predictive maintenance algorithms or reliability analysis.
 
 Although there are commercial packages that can perform this task, this library
 aims to be an open-source alternative for use by the research community.
@@ -21,10 +24,10 @@ Broad Functions of Package
 The three main parts of the package are the ``batch`` and ``classification``
 modules, as well as the ``clustering`` subpackage.
 
-Groups of related alarms as they appear during stoppages are called "batches",
-and ``batch`` contains the functions for creating these and assigning a high-level
-reason for the stoppage from the events and scada data. More information on the
-batches and the process behind creating them can be found in [1].
+``batch`` contains the functions for creating the batches of turbine alarms and
+assigning a high-level
+reason for the stoppage, gleaned from the events and scada data. More information on
+this can be found in [1].
 
 ``classification`` contains functions for labelling SCADA data based on the
 batches, for purposes of classification.
@@ -38,10 +41,11 @@ wind turbines more generally can be found in [2].
 
 Please raise issues here on GitHub for any issues encountered.
 
-Overview of Data
-================
+What Data Can I Work With?
+==========================
 The data manipulated in this library is turbine ``events`` data and ``scada``
 data.
+It must be in the formats described below.
 
 Event Data
 ----------
@@ -51,14 +55,18 @@ the turbine. This is instantaneous, and records information like faults that hav
 occurred, or status messages like low- or no- wind, or turbine shutting down due
 to storm winds.
 
-The data must have the following column headers:
-* ``turbine_num``: The turbine the data applies to.
+The data must have the following column headers and data:
+* ``turbine_num``: The turbine the data applies to
 * ``code``: There are a set list of events which can occur on the
-  turbine. Each one of these has an event code.
+  turbine. Each one of these has an event code
 * ``description``: Each event code also has an associated description
 * ``time_on``: The start time of the event
 * ``time_off``: The end time of the event
-* ``duration``: The duration of the event (can be calculated from )
+* ``duration``: The duration of the event (can be calculated from the two above)
+* ``stop_cat``: This is a category for the event if it has caused the turbine to
+  stop, or else its functional location in the turbine. E.g. if the event is
+  related to a pitch fault, it's stop category would be "fault-pitch", or something
+  similar.
 
 In addition, there must be a specific event ``code`` which
 signifies return to normal operation after any downtime or abnormal operating
@@ -71,8 +79,20 @@ The ``scada_data`` is typically recorded in 10-minute intervals and has attribut
 average power output, maximum, minimum and average windspeeds, etc. over the previous
 10-minute period.
 
-For the purposes
+For the purposes of this library, it must have the following column headers and
+data:
 
+* ``turbine_num``: The turbine the data applies to
+* ``time```: The 10-minute period the data belongs to
+* availability counters: Some of the functions for giving the batches a stop
+  category rely on availability counters. These are sometimes stored as part of
+  scada data, and sometimes in separate availability data. They count the portion
+  of time the turbine was in some mode of operation in each 10-minute period,
+  for availability calculations. For example, maintenance time, fault time, etc.
+  In order to be used in this library, the availability counters are
+  assumed to range between 0 and
+  *n* in each period, where *n* is some arbitrary maximum (typically 600, for
+  the 600 seconds in the 10-minute period).
 
 
 User Guide and Usage Examples
@@ -95,4 +115,5 @@ with case study." Energies 11.7 (2018): 1738.
 monitoring and reliability analyses." Energies 12.2 (2019): 201.
 
 [3] Leahy, Kevin, et al. "Cluster analysis of wind turbine alarms for
-characterising and classifying stoppages." IET Renewable Power Generation 12.10 (2018): 1146-1154.
+characterising and classifying stoppages." IET Renewable Power Generation 12.10 (2018):
+1146-1154.

@@ -103,7 +103,7 @@ See the examples/wtphm_readme_examples.ipynb notebook!.
 Documentation
 =============
 Documentation can be found `here <https://wtphm.readthedocs.io/en/latest/>`_. For
-a local copy of the docs, see `docs/_build/index.html`_.
+a local copy of the docs, see `here docs/_build/index.html`_.
 
 
 References

@@ -92,5 +92,5 @@ data:
 Documentation
 *************
 Documentation and user guide can be found on readthedocs
-`here <https://wtphm.readthedocs.io/en/latest/>`_. For a local copy of the docs,
-see `docs/_build/index.html <docs/_build/index.html>`_.
+`here <https://wtphm.readthedocs.io/en/latest/>`_. A local copy of the docs can
+be built by running `docs/build_docs.bat`_ with sphinx installed.

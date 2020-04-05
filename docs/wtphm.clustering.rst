@@ -4,7 +4,6 @@ wtphm.clustering
 .. automodule:: wtphm.clustering
    :members:
    :undoc-members:
-   :show-inheritance:
 
 
 .. toctree::

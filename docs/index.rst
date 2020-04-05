@@ -11,11 +11,18 @@
 
 
 .. toctree::
-   :maxdepth: 4
-   :caption: Contents:
+   :caption: User Guide
+   :maxdepth: 2
 
    user_guide
-   wtphm
+
+.. toctree::
+   :caption: API
+   :maxdepth: 2
+
+   wtphm.batch
+   wtphm.pred_processing
+   wtphm.clustering
 
 
 Github Page
@@ -28,4 +35,3 @@ Indices and tables
 
 * :ref:`genindex`
 * :ref:`modindex`
-* :ref:`search`

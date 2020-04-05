@@ -1,29 +1,26 @@
 .. comment
-
-Overview
-********
+WTPHM
+*****
 
 The **W**\ind **T**\urbine **P**\rognostics and **H**\ealth **M**\anagement library
 processes wind turbine events (also called alarms or status) data, as well as
-operational SCADA data (the usually 10-minute data coming off of wind turbines).
+operational SCADA data (the usually 10-minute data coming off of wind turbines)
+for easier fault detection, prognostics or reliability research.
 
 Turbine alarms often appear in high numbers during fault events, and significant
 effort can be involved in processing these alarms in order to find what actually
 happened.
-This module solves this by grouping similar alarm sequences together into "batches"
-of alarms, assigning a high-level "stoppage category" to each batch, and providing
-functionality to overlay this onto operational scada data for labelling for
-training predictive maintenance algorithms or reliability analysis.
+This module solves this by automatically identifying stoppages and fault periods
+in the data and assigning a high-level "stoppage category" to each.
+It also provides functionality to use this info to label SCADA data for training
+predictive maintenance algorithms.
 
 Although there are commercial packages that can perform this task, this library
 aims to be an open-source alternative for use by the research community.
-It was borne out of my own work for trying to process data for use in my PhD -
-hopefully this will allow other researchers to get into analysis quicker.
 
-I would greatly appreciate if you could acknowledge this repo if using it for
-any research objective.
-
-Please raise issues on GitHub for any bugs, questions or feature requests.
+Please reference this repo if used in any research. Any bugs, questions or
+feature requests can be raised here on GitHub. Can also reach me on twitter
+@leahykev.
 
 
 Is my Data Compatible?

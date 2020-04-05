@@ -1,3 +1,9 @@
+"""
+THIS IS NOT A UNIT TEST.
+
+Just a make-shift testing file because I'm shite at testing (for now).
+"""
+
 import sys
 import pandas as pd
 import importlib as imp

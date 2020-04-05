@@ -1,3 +1,8 @@
+"""
+This code is what is used in the user guide. Just produced here for testing
+and evaluation purposes.
+"""
+
 import wtphm
 import pandas as pd
 import seaborn as sns
@@ -72,17 +77,17 @@ batch_data = wtphm.batch.get_batch_stop_cats(
 
 # plots
 
-# durations = batch_data.groupby(
-#     'batch_cat').down_dur.sum().reset_index().sort_values(by='down_dur')
-# durations.down_dur = durations.down_dur.apply(
-#     lambda x: x / np.timedelta64(1, 'h'))
-# sns.set(font_scale=1.2)
-# sns.set_style('white')
-# fig, ax = plt.subplots(figsize=(4, 3))
-# g = sns.barplot(data=durations, x='batch_cat', y='down_dur', ax=ax,
-#                 color=sns.color_palette()[0])
-# g.set_xticklabels(g.get_xticklabels(), rotation=40)
-# ax.set(xlabel='Stop Category', ylabel='Total Downtime (hrs)')
-# ax.yaxis.grid()
-# plt.tight_layout()
-# plt.savefig('docs/ug_p1.png')
+durations = batch_data.groupby(
+    'batch_cat').down_dur.sum().reset_index().sort_values(by='down_dur')
+durations.down_dur = durations.down_dur.apply(
+    lambda x: x / np.timedelta64(1, 'h'))
+sns.set(font_scale=1.1)
+sns.set_style('white')
+fig, ax = plt.subplots(figsize=(4, 4))
+g = sns.barplot(data=durations, x='batch_cat', y='down_dur', ax=ax,
+                color=sns.color_palette()[0])
+g.set_xticklabels(g.get_xticklabels(), rotation=45)
+ax.set(xlabel='Stop Category', ylabel='Total Downtime (hrs)')
+ax.yaxis.grid()
+plt.tight_layout()
+plt.savefig('docs/ug_p1.png')

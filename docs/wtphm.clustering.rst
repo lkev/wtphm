@@ -1,5 +1,5 @@
-wtphm.clustering package
-========================
+wtphm.clustering
+================
 
 .. automodule:: wtphm.clustering
    :members:

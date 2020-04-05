@@ -99,9 +99,8 @@ thyristor 1 fault" with code 501,
 "pitch thyristor 2 fault" with code 502 and "pitch thyristor 3 fault"
 with code 503 all the same event description and code, i.e. they all
 become "pitch thyristor 1/2/3 fault (original codes 501/502/503)" with
-code 501. This is an optional step before creating batches of events to
-avoid similar faults which happen along different turbine axes being
-treated as different types of faults.
+code 501. Note that this is an entirely optional step before creating the
+batches of events.
 
 >>> # codes that cause the turbine to come to a stop
 ... stop_codes = event_data[

@@ -1,5 +1,5 @@
-wtphm package
-=============
+wtphm API
+=========
 
 .. automodule:: wtphm
    :members:
@@ -8,11 +8,6 @@ wtphm package
 
 
 .. toctree::
-
-   wtphm.clustering
-
-
-.. toctree::
-
    wtphm.batch
    wtphm.pred_processing
+   wtphm.clustering

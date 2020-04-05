@@ -37,9 +37,7 @@ author = 'Kevin Leahy'
 extensions = [
               'sphinx.ext.autodoc',
               'sphinx.ext.napoleon',
-              'sphinx_rtd_theme',
-              'matplotlib.sphinxext.plot_directive',
-              'sphinx.ext.doctest',
+              'sphinx_rtd_theme'
               # 'recommonmark'
               # 'm2r'
               ]

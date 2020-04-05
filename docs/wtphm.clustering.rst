@@ -7,19 +7,7 @@ wtphm.clustering package
    :show-inheritance:
 
 
-wtphm.clustering.batch\_clustering
-----------------------------------
+.. toctree::
 
-.. automodule:: wtphm.clustering.batch_clustering
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-wtphm.clustering.event\_probs
------------------------------
-
-.. automodule:: wtphm.clustering.event_probs
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
+   wtphm.clustering.batch_clustering
+   wtphm.clustering.event_probs

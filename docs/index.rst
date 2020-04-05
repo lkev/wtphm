@@ -3,14 +3,19 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+
+
+.. include:: ../README.rst
+   :start-after: comment
+   :end-before: Documentation
+
+
 .. toctree::
    :maxdepth: 4
    :caption: Contents:
 
+   user_guide
    wtphm
-
-
-.. include:: ../README
 
 
 Github Page

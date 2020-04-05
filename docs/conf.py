@@ -13,6 +13,10 @@
 import os
 import sys
 import sphinx_rtd_theme
+# import m2r
+# import recommonmark
+# from recommonmark.transform import AutoStructify
+
 sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('../wtphm'))
 sys.path.insert(0, os.path.abspath('../wtphm/classification'))
@@ -33,13 +37,26 @@ author = 'Kevin Leahy'
 extensions = [
               'sphinx.ext.autodoc',
               'sphinx.ext.napoleon',
-              'sphinx_rtd_theme'
+              'sphinx_rtd_theme',
+              'matplotlib.sphinxext.plot_directive',
+              'sphinx.ext.doctest',
+              # 'recommonmark'
+              # 'm2r'
               ]
+autodoc_member_order = 'bysource'
 
 source_suffix = {
     '.rst': 'restructuredtext',
     '.md': 'markdown',
 }
+
+# for matplotlib
+plot_include_source = False
+plot_html_show_source_link = False
+
+napoleon_google_docstring = False
+napoleon_use_rtype = False
+napoleon_use_param = False
 
 # letting readthedocs know that the master_file is not called contents, it's
 # called index
@@ -77,3 +94,12 @@ html_static_path = ['_static']
 autodoc_mock_imports = [
     "matplotlib", "numpy", "sklearn", "pandas", "operator", "warning",
     "scipy", "math", "itertools"]
+
+
+# The below is for recommonmark - for converting markdown to rst files
+# def setup(app):
+#     app.add_config_value('recommonmark_config', {
+#             # 'url_resolver': lambda url: github_doc_root + url,
+#             # 'auto_toc_tree_section': 'Contents',
+#             }, True)
+#     app.add_transform(AutoStructify)

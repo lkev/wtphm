@@ -12,19 +12,7 @@ wtphm package
    wtphm.clustering
 
 
-wtphm.batch
------------
+.. toctree::
 
-.. automodule:: wtphm.batch
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-wtphm.classification
---------------------
-
-.. automodule:: wtphm.classification
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
+   wtphm.batch
+   wtphm.pred_processing

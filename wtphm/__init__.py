@@ -4,6 +4,6 @@
 # from wtphm import batch
 # from wtphm import scada_labelling
 
-from wtphm import classification
+from wtphm import pred_processing
 from wtphm import clustering
 from wtphm import batch

@@ -1,4 +1,5 @@
 .. comment
+
 WTPHM
 *****
 
@@ -22,16 +23,23 @@ Please reference this repo if used in any research. Any bugs, questions or
 feature requests can be raised on GitHub. Can also reach me on twitter
 @leahykev.
 
+Installation
+============
+
+Install using pip!::
+
+  pip install wtphm
+
 
 Is my Data Compatible?
-**********************
+======================
 
 The data manipulated in this library are turbine events/status/alarms data and
 10-minute operational SCADA data.
 They must be in the formats described below.
 
 Event Data
-==========
+----------
 
 .. start event comment
 
@@ -61,7 +69,7 @@ period.
 .. end event comment
 
 SCADA/Operational data
-======================
+----------------------
 
 .. start scada comment
 
@@ -87,7 +95,8 @@ data:
 .. end scada comment
 
 Documentation
-*************
+=============
+
 Documentation and user guide can be found on readthedocs
 `here <https://wtphm.readthedocs.io/en/latest/>`_. A local copy of the docs can
 be built by running `<docs/build_docs.bat>`_ with sphinx installed.

@@ -5,7 +5,7 @@ with open("README.rst", "r") as fh:
 
 setuptools.setup(
     name="wtphm",
-    version="0.1.1",
+    version="0.1.2",
     author="Kevin Leahy",
     description="SCADA data pre-processing library for prognostics and health"
                 "management and fault detection of wind turbines",

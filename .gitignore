@@ -6,4 +6,3 @@ __pycache__/
 *.egg-info/
 build/
 dist/
-build_for_pip.bat

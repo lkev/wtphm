@@ -9,4 +9,4 @@ from wtphm import pred_processing
 from wtphm import clustering
 from wtphm import batch
 
-__version__ = '0.1.2'
+__version__ = '0.1.3'

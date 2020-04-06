@@ -60,9 +60,8 @@ The data must have the following column headers and information available:
   originated (e.g. pitch system), a category for grid-related events,
   that the turbine is down for testing or maintenance, in curtailment due to
   shadow flicker, etc.
-* In addition, there must be a specific event ``code`` which
-signifies return to normal operation after any downtime or abnormal operating
-period.
+* In addition, there must be a specific event ``code`` which signifies return to
+  normal operation after any downtime or abnormal operating period.
 
 .. end event comment
 

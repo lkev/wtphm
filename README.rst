@@ -30,6 +30,12 @@ Install using pip! ::
 
   pip install wtphm
 
+Documentation
+=============
+
+Documentation and user guide can be found on readthedocs
+`here <https://wtphm.readthedocs.io/en/latest/>`_. A local copy of the docs can
+be built by running `<docs/build_docs.bat>`_ with sphinx installed.
 
 Is my Data Compatible?
 ======================
@@ -90,10 +96,3 @@ data:
   the 600 seconds in the 10-minute period).
 
 .. end scada comment
-
-Documentation
-=============
-
-Documentation and user guide can be found on readthedocs
-`here <https://wtphm.readthedocs.io/en/latest/>`_. A local copy of the docs can
-be built by running `<docs/build_docs.bat>`_ with sphinx installed.

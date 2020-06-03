@@ -1,7 +1,7 @@
 """
 THIS IS NOT A UNIT TEST.
 
-Just a make-shift testing file because I'm shite at testing (for now).
+Just a make-shift testing file - will build unit tests when I have time.
 """
 
 import sys

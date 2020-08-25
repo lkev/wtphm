@@ -23,6 +23,8 @@ Please reference this repo if used in any research. Any bugs, questions or
 feature requests can be raised on GitHub. Can also reach me on twitter
 @leahykev.
 
+This library was used to build the "batch creation" and "data labelling" steps of `this paper <https://www.mdpi.com/1996-1073/11/7/1738>`_.
+
 Installation
 ============
 

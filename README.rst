@@ -35,8 +35,10 @@ Install using pip! ::
 Documentation
 =============
 
-Documentation and user guide can be found on readthedocs
-`here <https://wtphm.readthedocs.io/en/latest/>`_. A local copy of the docs can
+Full documentation and user guide can be found on
+`readthedocs <https://wtphm.readthedocs.io/en/latest/>`_.
+
+A local copy of the docs can
 be built by running `<docs/build_docs.bat>`_ with sphinx installed.
 
 Is my Data Compatible?
